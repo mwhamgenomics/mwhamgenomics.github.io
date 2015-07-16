@@ -33,15 +33,21 @@
 <h4>
 <a id="create-a-branch" class="anchor" href="#create-a-branch" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a branch</h4>
 
-<p>In the Git project, do:
-    git checkout -b my_branch
-or:
-    git branch -d my_branch</p>
+<p>In the Git project, do:</p>
+
+<pre><code>git checkout -b my_branch
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>git branch -d my_branch
+</code></pre>
 
 <p>It's a good idea to use a descriptive name for the branch, such as the issue/ticket you're working on. You can have multiple local branches and switch between them with git checkout.</p>
 
-<p>You can keep the branch local, or push it with:
-   git push -u origin my_branch
+<p>You can keep the branch local, or push it with:</p>
+
+<p>git push -u origin my_branch
 (You'll have to do this eventually to merge it)</p>
 
 <p>You can work on this branch, committing/pushing changes, and then open a pull request on GitHub once you think it's ready to merge.</p>
@@ -54,9 +60,11 @@ or:
 <h4>
 <a id="delete-branch" class="anchor" href="#delete-branch" aria-hidden="true"><span class="octicon octicon-link"></span></a>Delete branch</h4>
 
-<p>This should be done both on GitHub and locally. To do it locally:
-    git pull  # The master should now have all the changes
-    git branch -d my_branch  # This will not do anything is the branch hasn't been merged. Use -D to force-delete it.</p>
+<p>This should be done both on GitHub and locally. To do it locally:</p>
+
+<pre><code>git pull  # The master should now have all the changes
+git branch -d my_branch  # This will not do anything is the branch hasn't been merged. Use -D to force-delete it.
+</code></pre>
 
 <h4>
 <a id="things-that-should-not-be-in-git-repos" class="anchor" href="#things-that-should-not-be-in-git-repos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Things that should not be in Git repos</h4>
@@ -75,11 +83,13 @@ or:
 <h4>
 <a id="gitignore" class="anchor" href="#gitignore" aria-hidden="true"><span class="octicon octicon-link"></span></a>.gitignore</h4>
 
-<p>This sits in the repo's root directory and tells Git what files to ignore when detecting changes to commit. Syntax uses Linux-style paths and wildcards. Use a trailing slash to denote a directory. For example:
-    .python_history
-    <strong>pycache</strong>/
-    this/that/other.txt
-    one/two/<em>/</em>.sh</p>
+<p>This sits in the repo's root directory and tells Git what files to ignore when detecting changes to commit. Syntax uses Linux-style paths and wildcards. Use a trailing slash to denote a directory. For example:</p>
+
+<pre><code>.python_history
+__pycache__/
+this/that/other.txt
+one/two/*/*.sh
+</code></pre>
 
 <h4>
 <a id="merge-conflicts" class="anchor" href="#merge-conflicts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Merge conflicts</h4>
