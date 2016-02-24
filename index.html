@@ -1,107 +1,23 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>mwhamgenomics.github.io by mwhamgenomics</title>
+---
+layout: default
+---
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>mwhamgenomics.github.io</h1>
-        <p></p>
+<div class="home">
 
+  <h1 class="page-heading">Posts</h1>
 
-        <p class="view"><a href="https://github.com/mwhamgenomics">View My GitHub Profile</a></p>
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
-      </header>
-      <section>
-        <p>(Under construction. For now, have some notes on using Git. -M.)</p>
+        <h2>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+      </li>
+    {% endfor %}
+  </ul>
 
-<h3>
-<a id="git-branching" class="anchor" href="#git-branching" aria-hidden="true"><span class="octicon octicon-link"></span></a>Git branching</h3>
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
-<p>If multiple people are working on a project, they should not work directly on the master branch. Instead, they should work on their own local branches and merge them back to the master. This way, the master is always deployable.</p>
-
-<h4>
-<a id="create-a-branch" class="anchor" href="#create-a-branch" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a branch</h4>
-
-<p>In the Git project, do:</p>
-
-<pre><code>git checkout -b my_branch
-</code></pre>
-
-<p>or:</p>
-
-<pre><code>git branch -d my_branch
-</code></pre>
-
-<p>It's a good idea to use a descriptive name for the branch, such as the issue/ticket you're working on. You can have multiple local branches and switch between them with git checkout.</p>
-
-<p>You can keep the branch local, or push it with:</p>
-
-<p>git push -u origin my_branch
-(You'll have to do this eventually to merge it)</p>
-
-<p>You can work on this branch, committing/pushing changes, and then open a pull request on GitHub once you think it's ready to merge.</p>
-
-<h4>
-<a id="pull-request" class="anchor" href="#pull-request" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull request</h4>
-
-<p>It's usually a good idea to assign the request to someone other than yourself for peer review. The person reviewing the request can then review and close or approve it. Merging can usually be done automatically, and then the source branch can be deleted.</p>
-
-<h4>
-<a id="delete-branch" class="anchor" href="#delete-branch" aria-hidden="true"><span class="octicon octicon-link"></span></a>Delete branch</h4>
-
-<p>This should be done both on GitHub and locally. To do it locally:</p>
-
-<pre><code>git pull  # The master should now have all the changes
-git branch -d my_branch  # This will not do anything is the branch hasn't been merged. Use -D to force-delete it.
-</code></pre>
-
-<h4>
-<a id="things-that-should-not-be-in-git-repos" class="anchor" href="#things-that-should-not-be-in-git-repos" aria-hidden="true"><span class="octicon octicon-link"></span></a>Things that should not be in Git repos</h4>
-
-<ul>
-<li>Passwords. 'Nuff said.</li>
-<li>Command histories from interactive shells (.Rhistory, python_history, etc.). Command histories are user-specific, and good code should be user-agnostic.</li>
-<li>Large binary files. The amount of data stored locally is multiplied per user per branch.
-
-<ul>
-<li>You may have to store some things, though, like images.</li>
-</ul>
-</li>
-</ul>
-
-<h4>
-<a id="gitignore" class="anchor" href="#gitignore" aria-hidden="true"><span class="octicon octicon-link"></span></a>.gitignore</h4>
-
-<p>This sits in the repo's root directory and tells Git what files to ignore when detecting changes to commit. Syntax uses Linux-style paths and wildcards. Use a trailing slash to denote a directory. For example:</p>
-
-<pre><code>.python_history
-__pycache__/
-this/that/other.txt
-one/two/*/*.sh
-</code></pre>
-
-<h4>
-<a id="merge-conflicts" class="anchor" href="#merge-conflicts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Merge conflicts</h4>
-
-<p>If two branches diverge (e.g. someone else merges their branch to the master before you), you may have to do some fiddly manual merging. To help avoid this, you can merge changes to the master back into your branch:
-    git pull origin master</p>
-      </section>
-      <footer>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
-</html>
+</div>
