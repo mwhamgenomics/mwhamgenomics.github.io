@@ -2,7 +2,8 @@
 layout: post
 title:  "Git branching"
 date:   2015-07-16 16:22:59 +0000
-categories: programming, version control
+categories: ['programming', 'dev_ops']
+tags: ['version_control']
 ---
 
 ### Git branching
