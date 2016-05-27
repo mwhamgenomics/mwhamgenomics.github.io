@@ -1,0 +1,13 @@
+<!-- you have to pass in the entire mapping because `include` args don't seem to like [] brackets -->
+{% for mapping in include.list %}
+<h3 id="#{{ x[0] }}">{{ mapping[0] }}</h3>
+{{ mapping[1].size }} posts
+<ul class="post-list">
+  {% for post in mapping[1] %}
+    <li>
+      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+      <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+</ul>
+{% endfor %}

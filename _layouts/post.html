@@ -7,6 +7,17 @@ layout: default
 
   <div class="post-content" itemprop="articleBody">
     {{ content }}
+
+    {% if page.external_links %}
+    <h3>External links</h3>
+    {% for link in page.external_links %}
+    <h4>{{ link.title }}</h4>
+    <p class="post-meta"><a href="{{ link.link }}">{{ link.link }}</a></p>
+    <p class="post-meta">{{ link.description }}</p>
+    <br/>
+    {% endfor %}
+    {% endif %}
+
   </div>
 
 </article>
