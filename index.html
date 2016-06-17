@@ -8,9 +8,7 @@ layout: default
     {% for post in site.posts %}
       <li>
         <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}  -
-            {% for c in post.categories %}
-              {{ c }},
-            {% endfor %}
+            {% include comma_sep_links.html links=post.categories type='categories' %}
         </span>
         <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </li>

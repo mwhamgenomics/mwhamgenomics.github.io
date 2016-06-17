@@ -10,10 +10,10 @@
   {% endif %}
 
   {% if page.categories != null %}
-  <p class="post-meta">Categories: <span>{% for c in page.categories %}<a href="{{ '/categories#' | append: c }}">{{ c }}</a>, {% endfor %}</span></p>
+  <p class="post-meta">Categories: <span>{% include comma_sep_links.html links=page.categories type='categories' %}</span></p>
   {% endif %}
 
   {% if page.tags != null %}
-  <p class="post-meta">Tags: <span>{% for t in page.tags %}<a href="{{ '/tags#' | append: t }}">{{ t }}</a>, {% endfor %}</span></p>
+  <p class="post-meta">Tags: <span>{% include comma_sep_links.html links=page.tags type='tags' %}</span></p>
   {% endif %}
 </header>

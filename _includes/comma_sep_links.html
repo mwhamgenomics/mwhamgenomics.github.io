@@ -1,0 +1,4 @@
+{% assign z = include.links.size | minus:1 %}
+{% for x in (0..z) %}
+<a href="{{ '/' | append: include.type | append: '#' | append: include.links[x] }}">{{include.links[x]}}</a>{% if x < z %}, {% endif %}
+{% endfor %}
