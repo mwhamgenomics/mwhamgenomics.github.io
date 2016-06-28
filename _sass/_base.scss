@@ -104,7 +104,11 @@ a {
     }
 }
 
+/* add underlines to links contained within a <div class="post-content"> */
+div[class="post-content"] a {
+    text-decoration: underline;
 
+}
 
 /**
  * Blockquotes
