@@ -41,7 +41,7 @@ During the development of one of the open-source projects for Edinburgh Genomics
     sys.exit(main())
 {% endhighlight %}
 
-This kind of setup works well in a command-line app that isn't going to be imported by anything else. However, there are a couple of problems. Firstly, it involves fiddling around with sys.path, which ideally you wouldn't need to do. Secondly, you need to ensure that you are using the correct Python virtualenv for the app (you are [using virtualenv]({{site.url}}/programming/2016/03/24/virtualenv.html), aren't you?). Thirdly, you wouldn't be able to make a function from this project available to another project (at least not cleanly).
+This kind of setup works well in a command-line app that isn't going to be imported by anything else. However, there are a couple of problems. Firstly, it involves fiddling around with sys.path, which ideally you wouldn't need to do. Secondly, you need to ensure that you are using the correct Python virtualenv for the app (you are [using virtualenv](/programming/2016/03/24/virtualenv.html), aren't you?). Thirdly, you wouldn't be able to make a function from this project available to another project (at least not cleanly).
 
 EdinburghGenomics has two projects: Analysis-Driver and Reporting-App, both of which declare classes for reading config files, building web URLs and setting up logging. It would be good programming practice to only write code like this once and have this live in a third 'core' project, which is imported by other projects. This new module is called EGCG-Core, and is still in development as of this writing. The challenge now is making it possible for Analyis-Driver and Reporting-App to import it. You could just deploy the source code thus:
 

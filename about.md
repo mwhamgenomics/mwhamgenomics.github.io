@@ -18,7 +18,7 @@ M.
 \\
 \\
 \\
-I am a biologist by qualification, programmer by occupation and musician by night (and sometimes at the weekend). Most of the software projects I'm involved in can be found on GitHub.
+I am a biologist by qualification, programmer by occupation and musician by night. Most of the software projects I'm involved in can be found on GitHub.
 
 This website was built using [Jekyll](http://jekyllrb.com), styled with [Bootstrap](http://getbootstrap.com) and hosted on [GitHub Pages](https://pages.github.com).
 
