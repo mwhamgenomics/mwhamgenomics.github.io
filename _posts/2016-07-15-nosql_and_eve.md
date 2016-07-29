@@ -55,7 +55,7 @@ Here, eve is configured through a dict, mainly through the `DOMAIN` field. We te
 
     path/to/mongod --port 4998 --dbpath path/to/reporting_app_db
 
-You should now be able to go to 'http://localhost:4999/api/0.1' in a web browser and see a summary of all the endpoints in the database:
+Should you wish more control over things like logging and the storage engine, the documentation for MongoDB has an [extensive section](https://docs.mongodb.com/manual/reference/configuration-options) on configuring the server from a Yaml config file. However the database is configured, once it and the Eve app are running, you should now be able to go to 'http://localhost:4999/api/0.1' in a web browser and see a summary of all the endpoints in the database:
 
 {% highlight json %}
 {
