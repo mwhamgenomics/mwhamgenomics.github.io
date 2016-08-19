@@ -109,7 +109,9 @@ I wanted to set up the web app with a virtualenv (in any case, the app was writt
 
 Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit strange, as mod_wsgi is C, not Python. The reason it's there, though, is made clear on mod_wsgi's [PyPi page](https://pypi.python.org/pypi/mod_wsgi):
 
+<blockquote>
     Installation of mod_wsgi can now be performed in one of two ways. The first way of installing mod_wsgi is the traditional way that has been used in the past, where it is installed as a module directly into your Apache installation. The second and newest way of installing mod_wsgi is to install it as a Python package into your Python installation.
+</blockquote>
 
 It turns out that, at the point of installing mod_wsgi, it is compiled against a given Python interpreter. When installing it centrally via Linux's package manager, this will be the central Python install. Install it as a Python package, however, and it will be compiled against whichever interpreter you're using. This, then is how to point mod_wsgi at the correct version of Python - it's determined at compile-time.
 

@@ -56,3 +56,33 @@ a:hover {color: $grey-color-light;} //text-decoration: none;}
 a:active {color: $grey-color-light;}
 
 .highlighter-rouge {color: $grey-color-dark;}
+
+.column {
+    display: block;
+    float: left;
+    padding-right: 10px;
+    padding-left: 10px
+}
+
+.one-third {
+    width: 33%
+}
+
+.two-thirds {
+    width: 66%
+}
+
+.fig {
+    overflow: auto;
+}
+
+.fig > svg > rect {
+    fill: #9d9d9d;
+    stroke: black;
+    stroke-width: 1;
+}
+
+.fig > svg > line {
+    stroke: black;
+    stroke-width: 1;
+}
