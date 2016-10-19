@@ -15,50 +15,48 @@ external_links:
 Part of the functionality of EGCG's [Analysis Driver pipeline](http://github.com/EdinburghGenomics/Analysis-Driver) is to process BCL binary base call files from an Illumina HiSeqX into fastq sequence files. Most of the work is done by a program developed by Illumina called [bcl2fastq](http://support.illumina.com/downloads/bcl2fastq-conversion-software-v217.html), but we found a problem with the fastq files generated: some of their reads were very short - less than 36 bases. It turned out that these were a result of the DNA adapters used in the sequencing, and didn't actually contain any real sequence data. As a result, we had to add a processing stage after running bcl2fastq to scan a pair of fastqs and, if either the R1 or R2 for each read was too short, filter it out. Take the example fastq pair below:
 
 <div>
-    <div class="col-md-6">
+    <div class="col-sm-6">
         R1.fastq
-        <br/>
-        <code>
-            @read1 len 8
-            ATGCATGC
-            +
-            #--------
-            @read2 len 6
-            ATGCAT
-            +
-            #------
-            @read3 len 3
-            ATG
-            +
-            #---
-            @read4 len 9
-            ATGCATGCA
-            +
-            #---------
-        </code>
+        <pre><code>
+        @read1 len 8
+        ATGCATGC
+        +
+        #--------
+        @read2 len 6
+        ATGCAT
+        +
+        #------
+        @read3 len 3
+        ATG
+        +
+        #---
+        @read4 len 9
+        ATGCATGCA
+        +
+        #---------
+        </code></pre>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-sm-6">
         R2.fastq
-        <br>
-        </code>
-            @read1 len 9
-            ATGCATGCA
-            +
-            #---------
-            @read2 len 3
-            ATG
-            +
-            #---
-            @read3 len 8
-            ATGCATGC
-            +
-            #--------
-            @read4 len 7
-            ATGCATG
-            +
-            #-------
-        </code>
+        <pre><code>
+        @read1 len 9
+        ATGCATGCA
+        +
+        #---------
+        @read2 len 3
+        ATG
+        +
+        #---
+        @read3 len 8
+        ATGCATGC
+        +
+        #--------
+        @read4 len 7
+        ATGCATG
+        +
+        #-------
+        </code></pre>
     </div>
 </div>
 Here, with a read length threshold of 4, reads 2 and 3 should be filtered out of both fastqs, leaving us with an R1 and an R2 each containing a `@read1` and a `@read4`.
@@ -87,7 +85,7 @@ As mentioned above, data files are often GZ compressed in bioinformatics due to 
 
 At first, our fastq filterer did this, however when we ran it, it turned out to run at about the same speed as Sickle, despite not doing any of Sickle's sliding windows or quality filtering! Clearly, our original sliding-window-slowdown hypothesis was wrong, and the rate-limiting step was something else.
 
-We next tried removing data compression/decompression from the script (i.e, reading and writing uncompressed fastqs), which we found to improve performance significantly. It turned out that the rate-limiting step in our C script was the GZ compression of output data - decompression of input data was not found to significantly affect performance. Fortunately, it is possible to compress data in parallel with a multi-threaded version of `gz`: [pigz](https://github.com/madler/pigz) by Mark Adler, co-developer of `zlib`. If we could output uncompressed data from our script and pipe that into `pigz`, we might be able to get some good results.
+We next tried removing data compression/decompression from the script (i.e, reading and writing uncompressed fastqs), which we found to improve performance significantly. It turned out that the rate-limiting step in our C script was the GZ compression of output data - decompression of input data was not found to significantly affect performance. Fortunately, it is possible to compress data in parallel with a multi-threaded version of `gz`: [Pigz](https://github.com/madler/pigz) by Mark Adler, co-developer of `zlib`. If we could output uncompressed data from our script and pipe that into Pigz, we might be able to get some good results.
 
 One problem, though: we couldn't use simple Unix pipes, because we have two output fastqs (we could have used `stdout` and `stderr`, of course, but what if something went wrong and we had to print an error message?). Fortunately, Bash has a solution for this: process substitution. This allows you to create expressions that pretend to be files - they can be opened and written to, but underneath, they are Linux pipelines. It's probably easiest to give an example:
 
@@ -97,13 +95,13 @@ $ set -o pipefail
 $ ./filter_fastq_files --i1 ./R1.fastq.gz --i2 ./R2.fastq.gz --o1 >(pigz -c > ./R1_filtered.fastq.gz) --o2 >(pigz -c > ./R2_filtered.fastq.gz) --threshold 36
 {% endhighlight %}
 
-The fastq filterer we developed is fairly simple to use: the two input fastqs (R1 and R2) are passed as `i1` and `i2`, the corresponding (filtered) output fastqs are specified as `o1` and `o2`, and a length threshold at which to trim out a read pair is passed as `threshold`. The `>(...)` process substitutions may look unfamiliar, but they're not too complicated to understand. As far as the C script is concerned, the process substitutions passed as `o1` and `o2` are file paths, so it opens them using C's `stdio` library and writes to them. The process substitution accepts this output data and instead of writing it to disk, pipes it into pigz, which compresses it and then writes it to disk. The `set -o pipefail` in this case ensures that the whole pipeline returns a non-zero exit status if one command fails.
+The fastq filterer we developed is fairly simple to use: the two input fastqs (R1 and R2) are passed as `i1` and `i2`, the corresponding (filtered) output fastqs are specified as `o1` and `o2`, and a length threshold at which to trim out a read pair is passed as `threshold`. The `>(...)` process substitutions may look unfamiliar, but they're not too complicated to understand. As far as the C script is concerned, the process substitutions passed as `o1` and `o2` are file paths, so it opens them using C's `stdio` library and writes to them. The process substitution accepts this output data and instead of writing it to disk, pipes it into Pigz, which compresses it and then writes it to disk. The `set -o pipefail` in this case ensures that the whole pipeline returns a non-zero exit status if one command fails.
 
-Our fastq filterer now reads in GZ compressed data with `zlib`, does read length filtering, and then passes uncompressed output data to pigz via process substitution for multithreaded recompression. Using this approach, we were able to get the processing time for a pair of 4 Gb fastqs down from an hour and a half to about 5 minutes.
+Our fastq filterer now reads in GZ compressed data with `zlib`, does read length filtering, and then passes uncompressed output data to Pigz via process substitution for multithreaded recompression. Using this approach, we were able to get the processing time for a pair of 4 Gb fastqs down from an hour and a half to about 5 minutes.
 
 This improvement in performance was less dramatic when working with full-size test files, however we still found the script to run in about 1/5th or 1/6th of the time Sickle was taking. As of this writing, we are now working to integrate this new C script into our pipeline, allowing us to filter fastq reads much more quickly than before.
 
 ### Conclusions
 1. C is fast - really fast! Remember that an equivalent fastq filtering script in Python took about 3 times as long to run as Sickle or our initial C script.
 2. While things like GZ compression can slow down programs, C is so fast that sliding windows, quality filtering and GZ decompression can be done without such significant slow-downs.
-3. Multithreading of GZ compression is not only possible, but also very effective. Pigz probably deserves to be better known in scientific programming.
+3. Multithreading of GZ compression is not only possible, but also very effective. I'll definitely be using Pigz more in the future.
