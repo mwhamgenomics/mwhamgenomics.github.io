@@ -12,7 +12,7 @@ external_links:
       description: 'PEP 333 created the WSGI standard, allowing the development of interfaces between HTTP and Python. Updated in [PEP 3333](https://www.python.org/dev/peps/pep-3333).'
 ---
 
-Having developed a database/Rest-API/front-end stack, we had to set it up somewhere many people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
+Having developed a database/Rest-API/front-end stack, we had to set it up so that multiple people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
 
 ### Webserver script
 Firstly, we needed a script to start up Tornado with our apps loaded:
@@ -31,7 +31,7 @@ else:
 
 # set up the Flask app logger and some of Tornado's internal loggers
 loggers = (tornado.log.access_log, tornado.log.app_log, tornado.log.gen_log, app.logger)
-# set up handlers, etc...
+# set up the loggers with handlers, formatters, etc...
 
 watched_files = []  # some extra non-code files to watch for reloading, e.g. configs
 for f in watched_files:
@@ -46,11 +46,11 @@ tornado.ioloop.IOLoop.instance().start()
 
 {% endhighlight %}
 
-The important part is the last four lines. Tornado works in a similar way to Apache in terms of abstraction. Firstly there is the app, containing all of the functionality we wrote. On top of that, there is a WSGI container, which acts as an interface between the Python app and the HTTP server (which deals with HTTP traffic, not Python code - the fact that Tornado is written in Python is a bit of a red herring, which is why I haven't put a 'python' tag on this post). WSGI stands for Web Server Gateway Interface, and came from endeavours to run Python web apps on Apache, which will be discussed in the next post.
+The important part is the last four lines. Tornado works in a similar way to the Apache web server in terms of abstraction. Firstly there is the app, containing the code that we wrote - endpoints, server logic, etc. Around that, there is a WSGI container, which acts as an interface between the Python app and the HTTP server (which deals with HTTP traffic, not Python code - the fact that Tornado is written in Python is a bit of a red herring, which is why I haven't put a 'python' tag on this post). WSGI stands for Web Server Gateway Interface, and came from endeavours to get Python web apps to run on Apache, which will be discussed in the next post.
 
 We can now use this script to run each of our Flask apps, then navigate to the appropriate port on the hosting machine and see the running web app. However, this is not an ideal scenario: by now, you'll have three SSH terminals open, which must stay running for as long as you want the app to be available. It's possible to solve this problem by running the terminals in a Screen session, but a more reliable way is to detach the processes from the terminal. We did this simply by rolling our own. For `rest_api`:
 
-`rest_api.sh`:
+rest_api.sh:
 {% highlight bash %}
 
 case $1 in
@@ -84,4 +84,4 @@ esac
 
 When `rest_api.sh start` is run, a command to run the app is executed inside a `nohup &` statement, which detaches the process from external control, allowing it to keep running after logging out. Immediately, it uses `$!` to capture the process' pid and stores it as a lock file (a file which stores information in its filename, e.g. 'rest_api.123456'). `stop` can then use this lock file to find the right process to stop when `rest_api.sh stop` is run.
 
-If we do this for the Rest API, Flask app and NoSQL database, we now have a way of controlling each part of the stack. The use of `tornado.autoreload` also allows us to automatically reload the app whenever we update it. There are probably more refined ways of doing this, but this gave us an easy solution to running our Reporting App stack in production. Read on for my adventures in Apache when we decided to move to a full production environment.
+If we do this for the Rest API, Flask app and NoSQL database, we now have a way of controlling each part of the stack. The use of `tornado.autoreload` also allows us to automatically reload the app whenever we update it. There are probably more refined ways of doing this, but this gave us an easy solution to running our Reporting App stack in production. [Read on](/programming/2016/07/29/flask_on_apache.html) for my adventures in Apache when we decided to move to a full production environment.

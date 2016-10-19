@@ -22,22 +22,20 @@ After running our Reporting App for some time on a home-spun setup combining Tor
 
 Apache is one of the most popular HTTP servers on the internet, so is very full-featured and flexible to configure. However, its features and flexibility mean that it can be a bit tricky to set up. Another interesting problem also comes up at this point. Our Reporting App consists of a Flask web app mounted at the root level of the web server (e.g. localhost:5000/), and a Rest API mounted on a different port with a url prefix (e.g. localhost:5001/api/v1/). Here, however, we want both apps to run on port 80 and visit, in this example, `localhost/` for the web app and `localhost/api/v1/` for the Rest API. This means we need some way of multiplexing the two apps onto the same port, with the Apache server deciding whether to serve the web app or the Rest API, depending on which url is visited.
 
-Here, then are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server.
+Here, then, are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server. All of this was done on the CentOS 7 distribution of Linux. Depending on your distribution and version, files may have different names and/or locations. The gist of it, though, remains the same.
 
 ### Installing Apache and mod_wsgi
-Apache is listed in major Linux package managers, known by various names, including 'Apache2' and 'httpd'. Installation on CentOS goes something like:
+Apache is listed in most major Linux package managers as various names, including 'Apache2' and 'httpd'. Installation on CentOS goes something like:
 
     # yum install httpd
 
-This should both download and start the `httpd` service. Navigate to your hosting server (you don't need a port number because by default Apache runs on port 80, the default port that web browsers visit). and you should see a placeholder web page. This is an HTML page being served (on CentOS 7, at least) by an Apache configuration called `welcome.conf`, which can be found in `/etc/httpd/conf.d`. `conf.d` is the main folder you'll be working in for configuring Apache. `/etc/httpd/conf` contains the main `httpd.conf` config file, but you shouldn't normally need to edit it.
+This should both download and start the `httpd` service. Navigate to your hosting server (you don't need a port number because by default Apache runs on port 80, the port that web browsers visit for HTTP). and you should see a placeholder web page. This is an HTML page being served (on CentOS 7, at least) by an Apache configuration called `welcome.conf`, which can be found in `/etc/httpd/conf.d`. `conf.d` is the main folder you'll be working in for configuring Apache. `/etc/httpd/conf` contains the main `httpd.conf` config file, but you shouldn't normally need to edit it.
 
 Firstly, however, we need mod_wsgi. This is the module that allows WSGI-compatible web apps to run on Apache. At first, I tried installing it centrally:
 
     # yum install httpd-mod_wsgi
 
-This creates a `mod_wsgi.so` file in `/etc/httpd/modules` and a config file in `/etc/httpd/conf.modules.d`:
-
-10-mod_wsgi.conf:
+This creates a `mod_wsgi.so` file in `/etc/httpd/modules` and a config file in `/etc/httpd/conf.modules.d`, which looks something like:
 
     LoadModule wsgi_module /etc/httpd/modules/mod_wsgi.so
 
@@ -47,7 +45,7 @@ When Apache starts up, it scans its `/etc` folder for config files and loads the
 
 /etc/httpd/conf.d/app.conf:
 
-    <VirtualHost \*:80>
+    <VirtualHost *:80>
         ServerName <url of hosting server>
         WSGIDaemonProcess reporting_app
 
@@ -64,7 +62,7 @@ When Apache starts up, it scans its `/etc` folder for config files and loads the
         </Directory>
     </VirtualHost>
 
-Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the running of multiple websites on one Linux server - probably not needed in this case, but from what I've seen, it's generally good practice to use them. ServerName should be the url or IP address of the machine running the webserver, unless you have a DNS system that routes the url to your server. We now define the location of two WSGI scripts, one for the Rest API and one for the web app, and register them to the paths `/api/v1` and `/` respectively. The order in which these are declared is important - it's important to register `/api/v1` as the Rest API first, or `/api/v1` will be seen as part of the web app registered to the root (`/`). Finally, we define a Directory allowing the server to find the `static` and `template` files required by the web app (the Rest API doesn't need any of this since it serves plain text).
+Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the running of multiple websites on one Linux server - probably not needed in this case, but from what I've seen, it's generally good practice to use them. ServerName should be the url or IP address of the machine running the webserver, unless you have a DNS system that routes the url to your server. We now define the locations of two WSGI scripts, one for the Rest API and one for the web app, and register them to the paths `/api/v1` and `/` respectively. The order in which these are declared is important - `/api/v1` should be registered first or it will be seen as part of the web app registered to the root (`/`), and visiting `/api/v1` will not result in a request for the Rest API. Finally, we define a Directory allowing the server to find the `static` and `template` files required by the web app (the Rest API doesn't need any of this since it serves plain text).
 
 
 ### WSGI scripts
@@ -86,7 +84,7 @@ Now let's write a WSGI script:
 
 rest_api.wsgi
 {% highlight python %}
-top_level = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+top_level = '/var/www/Web-App'
 config_file = os.path.join(top_level, 'config.yaml')
 production = os.path.join(top_level, 'app', 'production')
 os.environ['CONFIGFILE'] = config_file  # the Rest API and web app use an environment variable to find their config file
@@ -105,7 +103,7 @@ It would have been nice if everything had worked as is, but unfortunately I enco
 
 
 #### Which Python?
-I wanted to set up the web app with a virtualenv (in any case, the app was written for Python 3, and CentOS' default is Python 2), but nowhere in the documentation for mod_wsgi could I find a way of pointing it at the right Python interpreter. When I tried to run the app (as below), I got a series of cryptic error messages suggesting it was still trying to run the app with Python 2. After looking at the stacktraces, it appeared that something was a bit amiss regarding the original mod_wsgi install.
+I wanted to set up the web app with a virtualenv (in any case, the app was written for Python 3, and CentOS' default is still Python 2), but nowhere in the documentation for mod_wsgi could I find a way of pointing it at the right Python interpreter. When I tried to run the app (as below), I got a series of cryptic error messages suggesting it was still trying to run the app with Python 2. After looking at the stacktraces, it appeared that something was a bit amiss regarding the original mod_wsgi install.
 
 Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit strange, as mod_wsgi is C, not Python. The reason it's there, though, is made clear on mod_wsgi's [PyPi page](https://pypi.python.org/pypi/mod_wsgi):
 
@@ -115,17 +113,20 @@ Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit st
 
 It turns out that, at the point of installing mod_wsgi, it is compiled against a given Python interpreter. When installing it centrally via Linux's package manager, this will be the central Python install. Install it as a Python package, however, and it will be compiled against whichever interpreter you're using. This, then is how to point mod_wsgi at the correct version of Python - it's determined at compile-time.
 
-Running `yum install mod_wsgi` will create a mod_wsgi `.so` file in the Python interpreter's `site-packages`, and will also create a new executable, `mod_wsgi-express`. When run, this sets up a complete isolated, automatically configured instance of Apache and runs it from the terminal - very useful for testing and debugging!
+Running `yum install mod_wsgi` will create a mod_wsgi `.so` file in the Python interpreter's `site-packages`, and will also create a new executable, `mod_wsgi-express`. When run, this actually sets up a complete, isolated and automatically configured instance of Apache, and runs it from the terminal - very useful for testing and debugging!
 
-Now, however, we need to point to the correct mod_wsgi in the central Apache install. To do this, we need to alter mod_wsgi's config file:
+Now that we can install the mod_wsgi `.so` to a virtualenv, we now just need to point Apache to it. To do this, we need to alter Apache's mod_wsgi config file:
 
 /etc/httpd/conf.modules.d/10-mod_wsgi.conf
 {% highlight bash %}
-# LoadModule wsgi_module '/etc/httpd/modules/mod_wsgi.so'  # main mod_wsgi installed via Yum - points to central Python install, so comment this out
-LoadModule wsgi_module '/path/to/python/virtualenv/site-packages/mod_wsgi/server/mod_wsgi-py34.cpython-34m.so'  # virtualenv's mod_wsgi - load this one instead
+# main mod_wsgi installed via Yum - points to central Python install, so comment this out
+# LoadModule wsgi_module '/etc/httpd/modules/mod_wsgi.so'
+
+# virtualenv's mod_wsgi - load this one instead
+LoadModule wsgi_module '/path/to/python/virtualenv/site-packages/mod_wsgi/server/mod_wsgi-py34.cpython-34m.so'  
 {% endhighlight %}
 
-`mod_wsgi` should now be running the Flask apps with the correct Python interpreter.
+Apache should now read this config file and load up the correct `mod_wsgi` and Python interpreter.
 
 #### Static libraries
 When setting up the central Python interpreter to create virtualenvs from, you may need to enable shared libraries, which you must then point to whenever you run it or any virtualenvs created from it. Setting LD_LIBRARY_PATH in your BashRC is simple enough, but you may also need to set it in the Apache config. At the top of `app.conf`:
@@ -136,7 +137,44 @@ When setting up the central Python interpreter to create virtualenvs from, you m
 As you can see, you may need to set a WSGIPythonHome as well so that mod_wsgi can call the Python interpreter and find its libraries.
 
 
-#### Other
-- If one or more or your apps implements authentication server-side, you may find some strange things happening on Apache. At first, for example, I was sending HTTP requests to the web app with some Auth headers, but in the logs I was seeing the app complaining that I supplied no credentials! It turns out that this is a result of a mod_wsgi config: by default, it doesn't pass HTTP Auth headers to the Python app. To allow this, simply add `WSGIPassAuthorization On` to your Apache config. Note, however, that mod_wsgi's b for a reason, namely that it allows all your WSGI apps to see the Auth headers
+#### Authentication
+If one or more or your apps implements authentication server-side, you may find some strange things happening on Apache. At first, for example, I was sending HTTP requests to the web app with some Auth headers, but in the logs I was seeing the app complaining that I supplied no credentials! It turns out that this is a result of a mod_wsgi config: by default, it doesn't pass on HTTP Auth headers to the Python app underneath. To allow this, simply add `WSGIPassAuthorization On` to your Apache config.
 
-- All of this was done on the CentOS 7 distribution of Linux. Depending on your distribution and version, files may have different names and/or locations. The gist of it, though, remains the same.
+Note, however, that mod_wsgi has this default behaviour for a reason - otherwise, it allows all your WSGI apps to see all Auth headers. Not such a concern here, but it could be a problem if you have many unconnected WSGI apps running on the same server - in this case, it would be better to handle authentication through Apache.
+
+#### Script reloading
+This was very simple in Tornado, but unfortunately isn't in Apache. Apache can be configured to automatically reload the WSGI app whenever the `.wsgi` script is updated (or `touch`-ed). When this happens, the `wsgi` script is re-run and import statements for the web app, submodules, etc are repeated as you'd expect. However, since the modules have already been imported into the Python interpreter, nothing happens, even though the code has changed! In this case, we need to explicitly tell the Python interpreter not only to import a module, but also to reload it. This is perfectly possible through `importlib`:
+
+{% highlight python %}
+from importlib import reload
+
+import a_module
+reload(a_module)
+{% endhighlight %}
+
+However, this reload is not recursive - any submodules within are not reloaded! In this case, the following would be necessary:
+
+{% highlight python %}
+import a_module
+reload(a_module.submodule_1)
+reload(a_module.submodule_2)
+reload(a_module)
+{% endhighlight %}
+
+If you are wondering why this is the case, my answer is that I don't know, and if you think this is ridiculous, I agree. In any case, our `rest_api.wsgi` now looks something like:
+
+{% highlight python %}
+top_level = '/var/www/Web-App'
+config_file = os.path.join(top_level, 'config.yaml')
+production = os.path.join(top_level, 'app', 'production')
+os.environ['CONFIGFILE'] = config_file  # the Rest API and web app use an environment variable to find their config file
+sys.path.append(production)  # make sure Python can import the app
+
+import config
+import rest_api
+reload(config)
+reload(rest_api.aggregation)  # reload a submodule
+reload(rest_api)  # reload the top-level module
+
+application = rest_api.app
+{% endhighlight %}

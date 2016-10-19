@@ -7,7 +7,7 @@ external_links:
     - title: Virtualenv documentation
       link: https://virtualenv.pypa.io
       description: Full documentation for virtualenv
-    - title: RVM
+    - title: RVM post
       link: /programming/2016/03/24/rvm.html
       description: See here for a post on RVM, Ruby's equivalent of virtualenv
 ---

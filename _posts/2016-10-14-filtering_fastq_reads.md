@@ -18,7 +18,7 @@ Part of the functionality of EGCG's [Analysis Driver pipeline](http://github.com
     <div class="col-md-6">
         R1.fastq
         <br/>
-        {% highlight bash %}
+        <code>
             @read1 len 8
             ATGCATGC
             +
@@ -35,13 +35,13 @@ Part of the functionality of EGCG's [Analysis Driver pipeline](http://github.com
             ATGCATGCA
             +
             #---------
-        {% endhighlight %}
+        </code>
     </div>
 
     <div class="col-md-6">
         R2.fastq
         <br>
-        {% highlight bash %}
+        </code>
             @read1 len 9
             ATGCATGCA
             +
@@ -58,7 +58,7 @@ Part of the functionality of EGCG's [Analysis Driver pipeline](http://github.com
             ATGCATG
             +
             #-------
-        {% endhighlight %}
+        </code>
     </div>
 </div>
 Here, with a read length threshold of 4, reads 2 and 3 should be filtered out of both fastqs, leaving us with an R1 and an R2 each containing a `@read1` and a `@read4`.
@@ -93,8 +93,8 @@ One problem, though: we couldn't use simple Unix pipes, because we have two outp
 
 
 {% highlight bash %}
-set -o pipefail
-./filter_fastq_files --i1 ./R1.fastq.gz --i2 ./R2.fastq.gz --o1 >(pigz -c > ./R1_filtered.fastq.gz) --o2 >(pigz -c > ./R2_filtered.fastq.gz) --threshold 36
+$ set -o pipefail
+$ ./filter_fastq_files --i1 ./R1.fastq.gz --i2 ./R2.fastq.gz --o1 >(pigz -c > ./R1_filtered.fastq.gz) --o2 >(pigz -c > ./R2_filtered.fastq.gz) --threshold 36
 {% endhighlight %}
 
 The fastq filterer we developed is fairly simple to use: the two input fastqs (R1 and R2) are passed as `i1` and `i2`, the corresponding (filtered) output fastqs are specified as `o1` and `o2`, and a length threshold at which to trim out a read pair is passed as `threshold`. The `>(...)` process substitutions may look unfamiliar, but they're not too complicated to understand. As far as the C script is concerned, the process substitutions passed as `o1` and `o2` are file paths, so it opens them using C's `stdio` library and writes to them. The process substitution accepts this output data and instead of writing it to disk, pipes it into pigz, which compresses it and then writes it to disk. The `set -o pipefail` in this case ensures that the whole pipeline returns a non-zero exit status if one command fails.
