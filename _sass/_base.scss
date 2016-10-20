@@ -37,6 +37,10 @@ ul, ol, dl, figure,
     margin-bottom: $spacing-unit / 2;
 }
 
+h1, h2, h3 {
+    margin-top: $spacing-unit;
+}
+
 
 
 /**
@@ -133,7 +137,7 @@ blockquote {
  */
 pre,
 code {
-    font-size: 15px;
+    font-size: $base-font-size * 0.9;
     border: none; /* 1px solid $grey-color-light;
     border-radius: 3px; */
     background-color: $grey-color-very-light;

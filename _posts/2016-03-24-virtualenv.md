@@ -18,12 +18,12 @@ Firstly to distinguish between Python 2 and 3, it is perfectly possible to have 
 
 Keeping track of modules per project also has its challenges. You might keep a folder of compiled/built modules for each project you have, and then point to the right one using `PYTHONPATH`. This, however, is quite a lot of work. Rather than going through Python's `pip` package manager, you're building each module manually. There is also nothing linking the modules to the Python version - you could end up using Python 3 and importing modules compiled for Python 2.
 
-As an alternative, you might even decide to make a Python developer really cringe and install everything on the machine's central Python instance. This is not a good idea for various reasons. Firstly, you might not have permission to do so on the machine. Secondly, what if your software is stable and you just want to let it sit there? If it's stable with Flask 0.10, then you don't particularly want someone to come along and update Flask to 0.10.1 without you knowing.
+As an alternative, you might even decide to make a Python developer really cringe and install everything on the machine's central Python instance. This is not a good idea for various reasons. Firstly, you might not have permission to do so on the machine. Secondly, what if your software is stable and you just want to let it sit there? If it's stable with Flask 0.10, then you don't particularly want someone to come along and update Flask to 0.11 without you knowing.
 
 Fortunately, there's a proper way of doing it all: virtualenv.
 
 ### virtualenv
-Virtualenv is a Python module that allows you to set up isolated instances of Python, with their own executables and libraries. Simply install it on one Python instance, and use it as a 'master' for setting up virtualenvs:
+Virtualenv is a Python module that allows you to set up isolated instances of Python, each with their own executables and libraries. Simply install it on one Python instance, and use that as a 'master' for setting up virtualenvs:
 
 {% highlight bash %}
     mwhamgenomics$ pip install virtualenv
@@ -55,4 +55,4 @@ You will notice that it modifies your command line with the virtualenv's name in
     mwhamgenomics$ deactivate
 {% endhighlight %}
 
-In production, you would have the virtualenv sitting alongside your project, or in a separate `virtualenvs` folder, and either call `<virtualenv>/bin/python` directly or use `<virtualenv>/bin/activate` if you use `PYTHONPATH`, etc. By using isolated virtual Python instances, you can link a distinct Python instance to each of your projects, keeping your environment predictable, the machine relatively clean, and the project insulated against system changes.
+In production, you would have the virtualenv sitting alongside your project, or in a separate `virtualenvs` folder, and either call `<virtualenv>/bin/python` directly or use `<virtualenv>/bin/activate` if you use `PYTHONPATH`, etc. By using isolated virtual Python instances, you can link a distinct Python instance to each of your projects, keeping your environment predictable, the machine clean, and the project insulated against system changes.
