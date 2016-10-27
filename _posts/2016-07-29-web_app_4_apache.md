@@ -18,9 +18,9 @@ external_links:
       description: Check this post for another useful, more Flask-centric look at mod_wsgi.
 ---
 
-After running our Reporting App for some time on a home-spun setup combining Tornado with Linux forking and Bash scripts, we decided to move to an Apache-based stack as a more professional alternative. This would allow us to have a constantly-running, autoreloading web app without having to cobble together our own infrastructure, and would also allow us to run on a default web browser port, meaning we wouldn't have to worry about adding the port number to the url when visiting it.
+After running our reporting app for some time on a home-spun setup combining Tornado with Linux forking and Bash scripts, we decided to move to an Apache-based stack as a more professional alternative. This would allow us to have a constantly-running, autoreloading web app without having to cobble together our own infrastructure, and would also allow us to run on a default web browser port, meaning we wouldn't have to worry about adding the port number to the url when visiting it.
 
-Apache is one of the most popular HTTP servers on the internet, so is very full-featured and flexible to configure. However, its features and flexibility mean that it can be a bit tricky to set up. Another interesting problem also comes up at this point. Our Reporting App consists of a Flask web app mounted at the root level of the web server (e.g. localhost:5000/), and a Rest API mounted on a different port with a url prefix (e.g. localhost:5001/api/v1/). Here, however, we want both apps to run on port 80 and visit, in this example, `localhost/` for the web app and `localhost/api/v1/` for the Rest API. This means we need some way of multiplexing the two apps onto the same port, with the Apache server deciding whether to serve the web app or the Rest API, depending on which url is visited.
+Apache is one of the most popular HTTP servers on the internet. It's very full-featured and flexible to configure, however it can be a bit tricky to set up. An interesting problem also comes up at this point. Our reporting app consists of a Flask web app mounted at the root level of the web server (hostname:5000/), and a Rest API mounted on a different port with a url prefix (hostname:5001/api/v1/). Here, however, we want both apps to run on port 80 and visit `hostname/` for the web app and `hostname/api/v1/` for the Rest API. This means we need some way of multiplexing the two apps onto the same port, with the Apache server deciding whether to serve the web app or the Rest API, depending on which url is visited.
 
 Here, then, are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server. All of this was done on the CentOS 7 distribution of Linux. Depending on your distribution and version, files may have different names and/or locations. The gist of it, though, remains the same.
 
@@ -29,7 +29,7 @@ Apache is listed in most major Linux package managers as various names, includin
 
     # yum install httpd
 
-This should both download and start the `httpd` service. Navigate to your hosting server (you don't need a port number because by default Apache runs on port 80, the port that web browsers visit for HTTP). and you should see a placeholder web page. This is an HTML page being served (on CentOS 7, at least) by an Apache configuration called `welcome.conf`, which can be found in `/etc/httpd/conf.d`. `conf.d` is the main folder you'll be working in for configuring Apache. `/etc/httpd/conf` contains the main `httpd.conf` config file, but you shouldn't normally need to edit it.
+This should both install and start the `httpd` service. Navigate to your hosting server (you don't need a port number because by default Apache runs on port 80, the port that web browsers visit for HTTP) and you should see a placeholder web page. This is an HTML page served according to an Apache configuration called `welcome.conf`, which can be found in `/etc/httpd/conf.d`. `conf.d` is the main folder you'll be working in for configuring Apache. `/etc/httpd/conf` contains the main `httpd.conf` config file, but you shouldn't normally need to edit it.
 
 Firstly, however, we need mod_wsgi. This is the module that allows WSGI-compatible web apps to run on Apache. At first, I tried installing it centrally:
 
@@ -62,7 +62,7 @@ When Apache starts up, it scans its `/etc` folder for config files and loads the
         </Directory>
     </VirtualHost>
 
-Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the running of multiple websites on one Linux server - probably not needed in this case, but from what I've seen, it's generally good practice to use them. ServerName should be the url or IP address of the machine running the webserver, unless you have a DNS system that routes the url to your server. We now define the locations of two WSGI scripts, one for the Rest API and one for the web app, and register them to the paths `/api/v1` and `/` respectively. The order in which these are declared is important - `/api/v1` should be registered first or it will be seen as part of the web app registered to the root (`/`), and visiting `/api/v1` will not result in a request for the Rest API. Finally, we define a Directory allowing the server to find the `static` and `template` files required by the web app (the Rest API doesn't need any of this since it serves plain text).
+Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the running of multiple websites on one Linux server - probably not needed in this case, but it's generally good practice to use them. ServerName should be the url or IP address of the machine running the webserver, unless you have a DNS system that routes the url to your server. We now define the locations of two WSGI scripts (one for the Rest API and one for the web app) and register them to the paths `/api/v1` and `/` respectively. The order in which these are declared is important - `/api/v1` should be registered first or it will be seen as part of the web app registered to the root (`/`), and visiting `/api/v1` will not result in a request for the Rest API. Finally, we define a Directory allowing the server to find the `static` and `template` files required by the web app (the Rest API doesn't need any of this since it serves plain text).
 
 
 ### WSGI scripts
@@ -75,14 +75,13 @@ We've pointed mod_wsgi to the locations of some `.wsgi` scripts, but we haven't 
         rest_api.wsgi
         web_app.wsgi
     app/
-        <versions>  # tagged versions of the Reporting App codebase
+        <versions>  # tagged versions of the reporting app codebase
         production/  # symlink to current production codebase
 
 {% endhighlight %}
 
 Now let's write a WSGI script:
 
-rest_api.wsgi
 {% highlight python %}
 top_level = '/var/www/Web-App'
 config_file = os.path.join(top_level, 'config.yaml')
@@ -103,7 +102,7 @@ It would have been nice if everything had worked as is, but unfortunately I enco
 
 
 #### Which Python?
-I wanted to set up the web app with a virtualenv (in any case, the app was written for Python 3, and CentOS' default is still Python 2), but nowhere in the documentation for mod_wsgi could I find a way of pointing it at the right Python interpreter. When I tried to run the app (as below), I got a series of cryptic error messages suggesting it was still trying to run the app with Python 2. After looking at the stacktraces, it appeared that something was a bit amiss regarding the original mod_wsgi install.
+I needed to set up a Python 3 virtualenv, but nowhere in the documentation for mod_wsgi could I find a way of pointing it at the right Python interpreter. When I tried to run the app (as below), I got a series of cryptic error messages suggesting it was still trying to run the app with Python 2. After looking at the stacktraces, it appeared that something was amiss regarding the original mod_wsgi install.
 
 Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit strange, as mod_wsgi is C, not Python. The reason it's there, though, is made clear on mod_wsgi's [PyPi page](https://pypi.python.org/pypi/mod_wsgi):
 
@@ -138,7 +137,7 @@ As you can see, you may need to set a WSGIPythonHome as well so that mod_wsgi ca
 
 
 #### Authentication
-If one or more or your apps implements authentication server-side, you may find some strange things happening on Apache. At first, for example, I was sending HTTP requests to the web app with some Auth headers, but in the logs I was seeing the app complaining that I supplied no credentials! It turns out that this is a result of a mod_wsgi config: by default, it doesn't pass on HTTP Auth headers to the Python app underneath. To allow this, simply add `WSGIPassAuthorization On` to your Apache config.
+If your apps implement server-side authentication, you may find some strange things happening on Apache. Initially, I was sending HTTP requests to the web app with some Auth headers, but in the logs I was seeing the app complaining that I supplied no credentials! It turns out that this is a result of a mod_wsgi config: by default, it doesn't pass on HTTP Auth headers to the Python app underneath. To allow this, simply add `WSGIPassAuthorization On` to your Apache config.
 
 Note, however, that mod_wsgi has this default behaviour for a reason - otherwise, it allows all your WSGI apps to see all Auth headers. Not such a concern here, but it could be a problem if you have many unconnected WSGI apps running on the same server - in this case, it would be better to handle authentication through Apache.
 
