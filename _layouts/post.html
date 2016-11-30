@@ -11,10 +11,8 @@ layout: default
     {% if page.external_links %}
     <h3>External links</h3>
     {% for link in page.external_links %}
-    <h4>{{ link.title }}</h4>
-    <p class="post-meta"><a href="{{ link.link }}">{{ link.link }}</a></p>
+    {{ link.title }}: <a href="{{ link.link }}">{{ link.link }}</a>
     <p class="post-meta">{{ link.description }}</p>
-    <br/>
     {% endfor %}
     {% endif %}
 

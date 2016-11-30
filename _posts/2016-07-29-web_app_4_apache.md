@@ -18,14 +18,14 @@ external_links:
       description: Check this post for another useful, more Flask-centric look at mod_wsgi.
 ---
 
-After running our reporting app for some time on a home-spun setup combining Tornado with Linux forking and Bash scripts, we decided to move to an Apache-based stack as a more professional alternative. This would allow us to have a constantly-running, autoreloading web app without having to cobble together our own infrastructure, and would also allow us to run on a default web browser port, meaning we wouldn't have to worry about adding the port number to the url when visiting it.
+After running our reporting app for some time on a home-spun setup combining Tornado with Linux forking and Bash scripts, we decided to move to an Apache-based stack as a more professional alternative. This would allow us to run the web app as a service rather than attached to a user. We would also be able to use Apache to multiplex our Rest API and web app onto one port. Furthermore if we run this on port 80, we wouldn't have to worry about adding the port number to the url when visiting it, because port 80 is the default port that web browsers visit.
 
-Apache is one of the most popular HTTP servers on the internet. It's very full-featured and flexible to configure, however it can be a bit tricky to set up. An interesting problem also comes up at this point. Our reporting app consists of a Flask web app mounted at the root level of the web server (hostname:5000/), and a Rest API mounted on a different port with a url prefix (hostname:5001/api/v1/). Here, however, we want both apps to run on port 80 and visit `hostname/` for the web app and `hostname/api/v1/` for the Rest API. This means we need some way of multiplexing the two apps onto the same port, with the Apache server deciding whether to serve the web app or the Rest API, depending on which url is visited.
+Apache is one of the most popular HTTP servers on the internet. It's very full-featured and flexible to configure, however it can be a bit tricky to set up. Running multiple apps on a single port especially would require some tricky configuration, because Apache would have to be able to decide whether to serve the web app or the Rest API, depending on which url is visited.
 
-Here, then, are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server. All of this was done on the CentOS 7 distribution of Linux. Depending on your distribution and version, files may have different names and/or locations. The gist of it, though, remains the same.
+Here, then, are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server. All of this was done on the CentOS 7 distribution of Linux. Depending on your OS, files may have different names and/or locations, but the gist of it remains the same.
 
 ### Installing Apache and mod_wsgi
-Apache is listed in most major Linux package managers as various names, including 'Apache2' and 'httpd'. Installation on CentOS goes something like:
+Apache is listed in most major Linux package managers as various names, including 'Apache2' and 'httpd'. On CentOS:
 
     # yum install httpd
 
@@ -110,9 +110,9 @@ Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit st
     Installation of mod_wsgi can now be performed in one of two ways. The first way of installing mod_wsgi is the traditional way that has been used in the past, where it is installed as a module directly into your Apache installation. The second and newest way of installing mod_wsgi is to install it as a Python package into your Python installation.
 </blockquote>
 
-It turns out that, at the point of installing mod_wsgi, it is compiled against a given Python interpreter. When installing it centrally via Linux's package manager, this will be the central Python install. Install it as a Python package, however, and it will be compiled against whichever interpreter you're using. This, then is how to point mod_wsgi at the correct version of Python - it's determined at compile-time.
+When mod_wsgi is installed, it is compiled against a given Python interpreter. When installing it centrally via Linux's package manager, this will be the central Python install. Install it as a Python package, however, and it will be compiled against whichever interpreter you're using at the time. This, then is how to point mod_wsgi at the correct version of Python - it's determined at compile-time.
 
-Running `yum install mod_wsgi` will create a mod_wsgi `.so` file in the Python interpreter's `site-packages`, and will also create a new executable, `mod_wsgi-express`. When run, this actually sets up a complete, isolated and automatically configured instance of Apache, and runs it from the terminal - very useful for testing and debugging!
+Running `pip install mod_wsgi` will create a mod_wsgi `.so` file in the Python interpreter's `site-packages`, and will also create a new executable, `mod_wsgi-express`. When run, this actually sets up a complete, isolated and automatically configured instance of Apache, and runs it from the terminal - very useful for testing and debugging!
 
 Now that we can install the mod_wsgi `.so` to a virtualenv, we now just need to point Apache to it. To do this, we need to alter Apache's mod_wsgi config file:
 
@@ -177,3 +177,5 @@ reload(rest_api)  # reload the top-level module
 
 application = rest_api.app
 {% endhighlight %}
+
+If your app starts getting complex with multiple modules and endpoints, authentication, etc, you might want to think about moving to a more elaborate platform like Django. For now, though, our app runs well on Flask through Apache and mod_wsgi.

@@ -2,7 +2,7 @@
 layout: post
 title: Building a web app - Introduction
 category: programming
-tags: ['python', 'reporting_app']
+tags: ['web_development', 'reporting_app']
 external_links:
     - title: Full Stack Python
       link: 'http://www.fullstackpython.com'

@@ -2,7 +2,6 @@
 layout: post
 title: Tritone substitutions
 category: music
-tags:
 external_links:
     - title: B3Monaco.com
       link: 'http://www.b3monaco.com'
@@ -14,7 +13,7 @@ Imagine you are listening to a guitarist and a bass player accompanying a solois
      F7                                  Bb7
     |F A Bb B|C A Bb B|C D Eb E|F G Ab A|Bb...
 
-This is a fairly conventional way of playing Jazz-inflected Blues. The bass walks between the F and C (the Root and the 5th) on the first beat of each bar, arriving at a Bb to mark the first bar of chord IV in the F blues progression, Bb7.
+This is a fairly conventional way of playing jazz-inflected blues. The bass walks between the F and C (the Root and the 5th) on the first beat of each bar, arriving at a Bb to mark the first bar of chord IV in the F blues progression, Bb7.
 
 However, you notice that sometimes the bass player plays something slightly different on the last bar before moving to chord IV, instead playing:
 
@@ -28,7 +27,7 @@ The tritone substitution has an interesting sound and useful underlying theory. 
 That, essentially, is the tritone substitution. It's a simple enough concept, but has many uses for adding suspense and variation to the music you make.
 
 ### Adding more notes
-Let's stay with the example of F blues, substituting an F7 for a B7. At this point, the notes being played are B, Eb and A (you can add an F# if you like to get the 5th). As ever, there are various notes you can add on top of basic chords to extend them, for example a G# to create a B7 with a 13th. There's not too much going on there, until you look at the chord that it's substituting for. You're playing the notes B, Eb, A, G# (ideally without the A and G# right next to each other), which is indeed B7 with a 13th, but if you remove the substitution and revert the bass note from B back to F, it becomes F7 with a raised 9th, or F7#9. 13th chords are commonplace in jazz, and raised 9ths are useful because they bridge the gap between major and minor tonality, and can give a nice moody feel to a Blues. Therefore, tritone subs allow you to alternate between 13th chords and raised 9th chords, so if you can play one, you can play the other.
+Let's stay with the example of F blues, substituting an F7 for a B7. At this point, the notes being played are B, Eb and A (you can add an F# if you like to get the 5th). As ever, there are various notes you can add on top of basic chords to extend them, for example a G# to create a B7 with a 13th. There's not too much going on there, until you look at the chord that it's substituting for. You're playing the notes B, Eb, A, G# (ideally without the A and G# right next to each other), which is indeed B7 with a 13th, but if you remove the substitution and revert the bass note from B back to F, it becomes F7 with a raised 9th, or F7#9. 13th chords are commonplace in jazz, and raised 9ths are useful because they bridge the gap between major and minor tonality, and can give a nice moody feel to a blues. Therefore, tritone subs allow you to alternate between 13th chords and raised 9th chords, so if you can play one, you can play the other.
 
 The 5th is equally as capable as the Root of creating a tritone substitution. Consider the following bass line:
 
@@ -46,7 +45,7 @@ Of course tritone substitutions don't have to be spontaneous - they can be writt
     | Bb7   | Bbm7   Eb7 | Am7 D7  | Abm7 Db7 |
     | Gm7   | C7         | F   Dm7 | Gm7  C7  ||
 
-This tune makes some clever uses of chord patterns to the point that it almost isn't a blues anymore - more like a Bop composition that just happens to be 12 bars long. There's a downward chromatic progression in fourths in bars 6-8 (Bb to Eb, A to D and Ab to Db), however this also results in a series of overlapping tritone substitutions. The Bbm7 and Eb7 in bar 6 lead you to expect it to resolve to Ab7 in bar 7, as per a II-V-I turnaround. Instead, however, it goes to D7, which has the same 3rd and 7th (F# and C), via an Am7 passing chord. The same thing happens in bars 7-8, going from Am7 and D7 to Db7 via Abm7. As an added bonus, if you play the 3rds and 7ths in these bars, you get a nice downward chromatic progression:
+This tune makes some clever uses of chord patterns to the point that it almost isn't a blues anymore - more like a bop composition that just happens to be 12 bars long. There's a downward chromatic progression in fourths in bars 6-8 (Bb to Eb, A to D and Ab to Db), however this also results in a series of overlapping tritone substitutions. The Bbm7 and Eb7 in bar 6 lead you to expect it to resolve to Ab7 in bar 7, as per a II-V-I turnaround. Instead, however, it goes to D7, which has the same 3rd and 7th (F# and C), via an Am7 passing chord. The same thing happens in bars 7-8, going from Am7 and D7 to Db7 via Abm7. As an added bonus, if you play the 3rds and 7ths in these bars, you get a nice downward chromatic progression:
 
     | Bbm7   Eb7    Am7  D7     Abm7  Db7   Gm7
     | Db/Ab  Db/G | C/G  C/F# | B/F#  B/F | Bb/F ...
@@ -58,6 +57,6 @@ Let's have a look at the first few bars of Keith Jarrett's tune Lucky Southern:
     | Gmaj7 | Bb7 A7 | D      | Eb7b5  |
     | D ...
 
-Again, you naturally expect a II-V-I turnaround in bars 6-7, i.e. Em7, A7, D. Instead however, the Em7 is traded for a Bb7, giving a downward chromatic progression to the A7. Then in the 8th bar, you naturally expect a V chord (A7) to get a Perfect Cadence leading into the next D chord. However, instead Jarrett flattens the 5th (as is the fashion with those trendy modern Jass players) to get A7b5, and then tritone-subs the bass note to get an Eb7b5!
+Again, you naturally expect a II-V-I turnaround in bars 6-7, i.e. Em7, A7, D. Instead however, the Em7 is traded for a Bb7, giving a downward chromatic progression to the A7. Then in the 8th bar, you naturally expect a V chord (A7) to get a perfect cadence leading into the next D chord. However, instead Jarrett flattens the 5th (as is the fashion with those trendy modern Jass players) to get A7b5, and then tritone-subs the bass note to get an Eb7b5!
 
 Overall, tritone substitutions are useful in any form of modern popular or classical music. They can be written or ad-lib, and the thought processes behind them can be as simple as 'leading down' into chord IV in the bass line, or complex above and beyond what is discussed here. They provide a useful layer of abstraction to those trying to add interesting chord extensions to their music, and help lift the harmonies, allowing the musician to add suspense and unpredictability to the listener's experience.

@@ -9,10 +9,13 @@ external_links:
       description: 'Official documentation for the Tornado webserver.'
     - title: PEP 333 - Python Webserver Gateway Interface v1.0.1
       link: 'https://www.python.org/dev/peps/pep-0333'
-      description: 'PEP 333 created the WSGI standard, allowing the development of interfaces between HTTP and Python. Updated in [PEP 3333](https://www.python.org/dev/peps/pep-3333).'
+      description: 'PEP 333 created the WSGI standard, allowing the development of interfaces between HTTP and Python.'
+    - title: PEP 3333
+      link: 'https://www.python.org/dev/peps/pep-3333'
+      description: 'An update of PEP 333 to accommodate changes between Python 2 and 3.'
 ---
 
-Having developed a database/Rest-API/front-end stack, we had to set it up so that multiple people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
+Having developed a database/Rest API/front-end stack, we had to set it up so that multiple people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
 
 ### Webserver script
 Firstly, we needed a script to start up Tornado with our apps loaded:

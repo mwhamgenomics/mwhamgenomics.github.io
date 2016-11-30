@@ -8,7 +8,7 @@ external_links:
       link: 'http://flask.pocoo.org'
 ---
 
-Since the main focus of the Edinburgh Genomics Reporting App is its back end (in terms of both rate of development and lines of code), this could turn out to be quite a short post. There's little point in rehashing Flask's documentation, so I will attempt to focus on the problems that we specifically have faced and solved.
+The main focus of the Edinburgh Genomics reporting app stack is the Rest API/database back end (both in terms of both rate of development and lines of code) rather than the front end. This post, then could turn out to be quite a short one. There's little point in rehashing Flask's documentation, so I will attempt to focus on the problems that we specifically have faced and solved.
 
 The basics of the app's setup is almost exactly the same as the introductory section of Flask's documentation:
 
@@ -21,7 +21,7 @@ def main_page():
     return 'This is a main page'
 {% endhighlight %}
 
-Visit the top level of this app in a web browser and you will see the text 'This is a main page'. Of course, this is not very useful. We could have the function return html content, but it would be a hugely horrible function if we want to render a full formatted web page. If we want to do that, it's best to use templates.
+Visit the top level of this app in a web browser and you will see the text 'This is a main page'. Of course, this is not very useful. We could have the function return html content, but it would be a hugely horrible function if we tried to render a full html-formatted web page. If we want to do that, it's best to use templates.
 
 ### HTML templates
 
@@ -47,7 +47,7 @@ templates/main_page.html:
 </html>
 {% endraw %}{% endhighlight %}
 
-Of course we don't want to have to do this for every page we want. Ideally we would structure it like classes - a base template, with sub-templates that inherit from it. Let's add another page, and add some Jinja2 syntax to the templates.
+Of course we don't want to have to write all of this boilerplate for every page we want. Ideally we would structure it like classes - a base template, with sub-templates that inherit from it. Let's add another page, and add some Jinja2 syntax to the templates.
 
 templates/base.html:
 {% highlight html %}{% raw %}

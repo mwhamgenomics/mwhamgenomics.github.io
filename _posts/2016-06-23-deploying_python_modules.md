@@ -12,7 +12,7 @@ external_links:
       description: More general docs on deploying Python projects in general.
 ---
 
-For all of Python's simplicity and intuitiveness at the point of development, management and versioning of 3rd-party Python modules is where it starts getting complicated. Given the extensive community-driven ecosystem of the [Python Package Index](https://pypi.python.org/pypi) (or PyPi), it's pretty much inevitable that keeping track of dependencies is going to get a bit tricky.
+For all of Python's simplicity and intuitiveness at the point of development, management and versioning of 3rd-party Python modules can get rather complicated. Given the extensive community-driven ecosystem of the [Python Package Index](https://pypi.python.org/pypi) (or PyPi), it's pretty much inevitable that keeping track of dependencies is going to get a bit tricky.
 
 (Note: this post will not discuss publishing projects to PyPi. It will, however, discuss deploying modules from version control)
 
@@ -40,9 +40,9 @@ from a_project import main
 sys.exit(main())
 {% endhighlight %}
 
-This kind of setup works well in a command-line app that isn't going to be imported by anything else. However, there are a couple of problems. Firstly, it involves fiddling around with sys.path, which ideally you wouldn't need to do. Secondly, you need to ensure that you are using the correct Python virtualenv for the app (you are [using virtualenv](/programming/2016/03/24/virtualenv.html), aren't you?). Thirdly, you wouldn't be able to make a function from this project available to another project (at least not cleanly).
+This works well if your app isn't going to be imported by anything else. However, there are a couple of problems. Firstly, it involves fiddling around with sys.path, which ideally you wouldn't need to do. Secondly, you need to use the correct Python virtualenv for the app (you are [using virtualenv](/programming/2016/03/24/virtualenv.html), aren't you?). Thirdly, there's no clean way of making a function from this project available to another project.
 
-EdinburghGenomics has two projects: Analysis-Driver and Reporting-App, both of which declare classes for reading config files, building web URLs and setting up logging. It would be good programming practice to only write code like this once and have this live in a third 'core' project, which is imported by other projects. We decided to do this and call the new module EGCG-Core. The challenge now is making it possible for Analysis-Driver and Reporting-App to import it. You could just deploy the source code thus:
+Edinburgh Genomics has two projects: Analysis-Driver and Reporting-App, both of which declare classes for reading config files, building web URLs and setting up logging. Ideally we'd only have to write shared code like this once and put this into a separate 'core' project, which is imported by our various apps. We decided to do this and call the new module EGCG-Core. The challenge now is making it possible for Analysis-Driver and Reporting-App to import it. You could just deploy the source code thus:
 
     projects/
         EGCG-Core/
@@ -52,9 +52,9 @@ EdinburghGenomics has two projects: Analysis-Driver and Reporting-App, both of w
         Analysis-Driver
         Reporting-App
 
- Analysis-Driver and Reporting-App can access the common functionality of EGCG-Core if EGCG-Core is on `sys.path` or `PYTHONPATH`. That's a big 'if' though, and the problem of using the correct Python interpreter remains.
+ Analysis-Driver and Reporting-App could access EGCG-Core if it's on `sys.path` or `PYTHONPATH`. That's one more thing to keep track of, though, and the problem of using the correct Python interpreter remains.
 
-To solve this problem, it is necessary to delve into Python's packaging and deployment features, and write a `setup.py` build/deploy script. You may have come across this setup.py file before from installing 3rd-party modules via the command `python setup.py install`. While the prospect of writing a build script may sound terrifying, it really isn't. To write a setup.py, it's easiest to look at examples. Let's look at how the setup.py for EGCG-Core looked upon its initial commit:
+To solve this problem, it is necessary to delve into Python's packaging and deployment features, and write a `setup.py` build/deploy script. You may have come across the command `python setup.py install` while installing modules. While the prospect of writing a build script may sound terrifying, it really isn't. To write a setup.py, it's easiest to look at examples. Let's look at how the setup.py for EGCG-Core looked upon its initial commit:
 
 {% highlight python %}
 from distutils.core import setup
@@ -105,7 +105,7 @@ setup(
 )
 {% endhighlight %}
 
-The `setup` function is still there, but with a few differences. Firstly instead of distutils, it uses setuptools, a more full-featured alternative which is also in the Python standard library (underneath, it subclasses distutils, so things that work in distutils should work in setuptools). This allows you to specify some additional arguments to `setup`, such as `install_requires`, which can provide information on the dependencies of your module (`requires` just provides end-user metadata, whereas `install_requires` can be passed to the installation process to automatically install dependencies). Finally, some logic has been added to reduce the amount of hard-coding in the script. Requirements are obtained from parsing `requirements.txt` (with some formatting changes), `packages=` now goes through `setuptools.find_packages`, and version information is imported from the project itself.
+The `setup` function is still there, but with a few differences. Firstly instead of distutils, it uses setuptools, a more full-featured extension of distutils which is also in the standard library. This allows you to specify some additional arguments such as `install_requires`, which can pass information to the installation process and automatically install dependencies. Finally, some logic has been added to reduce the amount of hard-coding in the script. Requirements are obtained from parsing `requirements.txt` (with some formatting changes), `packages=` now goes through `setuptools.find_packages`, and version information is imported from the project itself.
 
 A project with a setup.py like this can be installed via `python setup.py install` or through pip. Upon doing so, your module will be installed to the Python interpreter's `site-packages`, at last giving a strong link between the module and the interpreter.
 
@@ -118,8 +118,8 @@ The requirements.txt file for Analysis-Driver, for example, points to a dependen
 
     pip install git+https://github.com/<organisation>/<project_name>.git@<tag_version>
 
-### Beware top-level files - distinguishing between the project and the module
-It's important to bear in mind that what you have in version control is not the same as what will be deployed into `site-packages`. In the above example, the versioned project is called EGCG-Core but the module given to `setup` in `packages=` is egcg_core (along with its submodules). This means that your module cannot depend on any top-level files in the project, because they won't actually be installed. For example, EGCG-Core used to have the following structure:
+### Beware top-level files - the project vs the module
+It's important to bear in mind that what you have in version control is not the same as what will be deployed into `site-packages`. In the above example, the versioned project is called EGCG-Core but the module given to `setup` in `packages=` is `egcg_core`. This means that your module cannot depend on any top-level files in the project, because they won't actually be installed. For example, EGCG-Core used to have the following structure:
 
     EGCG-Core/
         requirements.txt
@@ -127,7 +127,7 @@ It's important to bear in mind that what you have in version control is not the 
         egcg_core/
             __init__.py
 
-\_\_init\_\_.py used to set a variable called `__version__` by parsing version.txt. This worked fine when the module was run from source, but not when run as a setup.py installation, as `version.txt` was not part of the egcg_core module. There are ways of specifying data files to be installed along with the module, but it's far easier and cleaner in this case to just set `__version__` directly in \_\_init\_\_.py. The reason we used a version.txt originally was so we could parse the file for version information both at runtime and at the point of deploying a new Git tag via a versioning script.
+\_\_init\_\_.py used to set a variable called `__version__` by parsing version.txt. This worked fine when the module was run from source, but not when run as a setup.py installation, as `version.txt` was not installed with `egcg_core`. There are ways of specifying data files to be installed along with the module, but it's far easier and cleaner in this case to just set `__version__` directly in \_\_init\_\_.py. The reason we used a version.txt originally was so we could parse the file for version information both at runtime and at the point of deploying a new Git tag via a versioning script.
 
 version.txt:
 
@@ -140,7 +140,7 @@ git tag $version
 git push --tags
 {% endhighlight %}
 
-Setting the version in \_\_init\_\_.py doesn't actually change that much - you just need to parse out the expression that sets `__version__`.
+Setting the version in \_\_init\_\_.py doesn't actually change that much - we just need to parse out the expression that sets `__version__`.
 
 \_\_init\_\_.py:
 {% highlight python %}

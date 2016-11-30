@@ -12,9 +12,9 @@ external_links:
       description: Documentation for the many features of Eve.
 ---
 
-Behind the scenes, the Edinburgh Genomics Reporting App is powered by MongoDB and Eve. MongoDB, being a NoSQL database, stores JSON instead of tables, as in SQL databases. This makes it much more free-form than SQL, and allows for nesting of data structures, although the way we have been using it, there's not actually that much difference from SQL.
+Behind the scenes, the Edinburgh Genomics reporting app is powered by MongoDB and Eve. MongoDB, being a NoSQL database, stores JSON instead of tables, as in SQL databases. This makes it much more free-form than SQL, and allows for nesting of data structures, although the way we have been using it, there's not actually that much difference from SQL.
 
-A running database was all we really needed to power the reporting app, i.e. the front end website could have queried the database directly. This, however, would have made things complicated for other parts of our stack. Our pipelines and other scripts all push information to this database, so all of our programs would have to load a MongoDB client, set up a connection and push data to it, hopefully in the correct format. Because we had so many things using this database, and because we still wanted some kind of schema, we decided we wanted to interact with the database through a Rest API.
+We could have had the front end website query the database directly, however this would have made things complicated for other parts of our stack. Our pipelines and other scripts all push data to this database, so all of our programs would have to load a MongoDB client, set up a connection and push data, hopefully in the correct format. Because we had so many things using this database, and because we still wanted some kind of schema, we decided we wanted to interact with the database through a Rest API.
 
 Eve is a Flask-based Rest API library. This gave us an HTTP-based interface to the database and a very flexible schema for data flowing in. This allowed us to validate the data being stored while also being able to add new types of data over time without migrating the database.
 
