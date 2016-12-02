@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Building a web app part 3 - Production environment on Tornado
-category: programming
-tags: ['web_development', 'reporting_app']
+category: Programming
+tags: ['web development', 'reporting app']
 external_links:
     - title: Tornado
       link: 'http://www.tornadoweb.org'
@@ -15,7 +15,7 @@ external_links:
       description: 'An update of PEP 333 to accommodate changes between Python 2 and 3.'
 ---
 
-Having developed a database/Rest API/front-end stack, we had to set it up so that multiple people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
+Having developed a database/API/front-end stack for the Edinburgh Genomics reporting app, we had to set it up on a webserver so that people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
 
 ### Webserver script
 Firstly, we needed a script to start up Tornado with our apps loaded:

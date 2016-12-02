@@ -1,8 +1,7 @@
 ---
 layout: post
 title: 'Filtering fastq reads: adventures in optimisation'
-category: bioinformatics
-tags: []
+category: Bioinformatics
 external_links:
     - title: Sickle
       link: 'https://github.com/najoshi/sickle'

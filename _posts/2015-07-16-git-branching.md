@@ -2,8 +2,8 @@
 layout: post
 title:  "Git branching"
 date:   2015-07-16 16:22:59 +0000
-category: programming
-tags: ['version_control']
+category: Programming
+tags: ['version control']
 ---
 
 If multiple people are working on a project, they should ideally not work directly on the master branch. Instead, when they want to add something to the project, they should create a separate branch on which they make changes, test, debug, etc, and and then merge that branch to the master when ready. This way, the master is always fully functional. Modern development environments often have functionality to aid version control and branching, but this article aims to discuss how to use branches via the plain command line.

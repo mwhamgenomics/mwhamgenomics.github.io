@@ -1,14 +1,14 @@
 ---
 layout: post
 title: Building a web app part 2 - Flask front end
-category: programming
-tags: ['python', 'web_development', 'reporting_app']
+category: Programming
+tags: ['Python', 'web development', 'reporting app']
 external_links:
     - title: Official Flask documentation.
       link: 'http://flask.pocoo.org'
 ---
 
-The main focus of the Edinburgh Genomics reporting app stack is the Rest API/database back end (both in terms of both rate of development and lines of code) rather than the front end. This post, then could turn out to be quite a short one. There's little point in rehashing Flask's documentation, so I will attempt to focus on the problems that we specifically have faced and solved.
+The main focus of the stack in Edinburgh Genomics' reporting app is the Rest API/database back end (both in terms of both rate of development and lines of code) rather than the front end. This post, then, could turn out to be quite a short one. There's little point in rehashing Flask's documentation, so instead I will briefly describe how we set up a simple web app with template rendering .
 
 The basics of the app's setup is almost exactly the same as the introductory section of Flask's documentation:
 
@@ -91,11 +91,12 @@ templates/second_page.html:
 Here, base.html contains a default <head>, allowing css styling to be included in all sub-templates. Each sub-template implements a `title` block, which will be inserted into the `<title>` element of the base template. `main_page` will have the base's `content` block plus some of its own stuff, and `second_page` completely overrides `content`. Text can be added into `second_page` by Flask with `flask.render_template('second_page.html', text='Some text to add')`.
 
 ### User input
-While visiting websites, you may have noticed that the URL of the page sometimes has a `?` followed by a series of `x=y` key-value pairs. This is the query string, and is a useful way passing data from the client to the server. This is accessible to Flask via `flask.request`:
+While visiting websites, you may have noticed that the URL of the page sometimes has a `?` followed by a series of `x=y` key-value pairs. This is the query string, and is accessible to Flask via `flask.request`:
 
 {% highlight python %}
-# localhost:5000/second_page?input_text=thisthatother
 @app.route('/second_page')
 def second_page():
     return flask.render_template('second_page.html', text=flask.request.args.get('input_text'))
 {% endhighlight %}
+
+If this endpoint is visited, e.g. via the url `localhost:5000/second_page?input_text=thisthatother`, the string `thisthatother` will be passed via flask.request.args to the template and rendered on the web page. Not too useful in this case, but very useful for instances where data needs to be passed from the client to the server.

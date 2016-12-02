@@ -1,8 +1,7 @@
 ---
 layout: post
 title: Chord extensions
-category: music
-tags:
+category: Music
 
 ---
 

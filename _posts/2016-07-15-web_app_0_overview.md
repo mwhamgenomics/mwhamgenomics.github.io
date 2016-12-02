@@ -1,18 +1,18 @@
 ---
 layout: post
 title: Building a web app - Introduction
-category: programming
-tags: ['web_development', 'reporting_app']
+category: Programming
+tags: ['web development', 'reporting app']
 external_links:
     - title: Full Stack Python
       link: 'http://www.fullstackpython.com'
       description: A very useful website for all aspects of Python web development.
 ---
 
-During my work at Edinburgh Genomics, I've had my first foray into web development. Due to the huge numbers of samples we deal with, we needed a way of viewing all of the metadata we were generating in a better way than pasting tsv content into the local wiki, as we did initially. Static sites like blogs and wikis are all very well, but reporting on all of the hundreds of samples passing through our pipelines would require a dynamic website powered by a database and web server.
+During my work at Edinburgh Genomics, I had my first foray into web development. Due to the huge numbers of samples we deal with, we needed a way of viewing all of the metadata we were generating in a better way than pasting tsv content into the local wiki, as we were doing initially. Static sites like blogs and wikis are all very well, but reporting on all of the hundreds of samples passing through our pipelines would require a dynamic website powered by a database and web server.
 
 ### Architecture
-First, we had to consider the overall architecture of this new Reporting App. Our data processing pipelines would push metadata to a database, which would then be queried by a front-end web app and displayed. We could have gone with this simple two-piece architecture, but we decided to add a third layer: a Rest API on top of the database. Apart from being something of a fad nowadays, a Rest API provides a useful layer of control on top of the database, as well as a convenient and securable HTTP interface for pushing and pulling content.
+First, we had to consider the overall architecture of this new Reporting App. Our data processing pipelines would push data to a database, which would then be queried by a front-end web app and displayed. We could have gone with this simple two-piece architecture, but we decided to add a third layer: a Rest API on top of the database. Apart from being something of a fad nowadays, a Rest API provides a useful layer of control on top of the database, as well as a convenient and securable HTTP interface for pushing and pulling content.
 
 <div>
     <figure class="fig">

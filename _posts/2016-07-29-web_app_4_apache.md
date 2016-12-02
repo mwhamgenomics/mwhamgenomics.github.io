@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Building a web app part 4 - Running multiple Flask apps on Apache
-category: programming
-tags: ['web_development', 'reporting_app']
+category: Programming
+tags: ['web development', 'reporting app']
 external_links:
     - title: Apache
       link: 'http://httpd.apache.org'

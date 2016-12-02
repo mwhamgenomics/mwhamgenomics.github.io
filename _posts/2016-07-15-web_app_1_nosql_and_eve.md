@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Building a web app part 1 - NoSQL and Eve
-category: programming
-tags: ['python', 'web_development', 'reporting_app']
+category: Programming
+tags: ['Python', 'web development', 'reporting app']
 external_links:
     - title: MongoDB documentation
       link: 'https://docs.mongodb.com'
@@ -12,7 +12,7 @@ external_links:
       description: Documentation for the many features of Eve.
 ---
 
-Behind the scenes, the Edinburgh Genomics reporting app is powered by MongoDB and Eve. MongoDB, being a NoSQL database, stores JSON instead of tables, as in SQL databases. This makes it much more free-form than SQL, and allows for nesting of data structures, although the way we have been using it, there's not actually that much difference from SQL.
+Behind the scenes, the reporting app we developed at Edinburgh Genomics is powered by MongoDB and Eve. MongoDB, being a NoSQL database, stores JSON instead of tables, as in SQL databases. This makes it much more free-form than SQL, and allows for nesting of data structures, although the way we have been using it, there's not actually that much difference from SQL.
 
 We could have had the front end website query the database directly, however this would have made things complicated for other parts of our stack. Our pipelines and other scripts all push data to this database, so all of our programs would have to load a MongoDB client, set up a connection and push data, hopefully in the correct format. Because we had so many things using this database, and because we still wanted some kind of schema, we decided we wanted to interact with the database through a Rest API.
 

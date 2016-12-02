@@ -9,7 +9,7 @@
 title: mwhamgenomics.github.io
 # email: your-email@domain.com
 description: >  # ignore newlines until "baseurl:"
-  Biology, programming and music on the same page.
+  Biology, programming, music.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://mwhamgenomics.github.io" # the base hostname & protocol
 # twitter_username: jekyllrb

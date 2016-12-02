@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Tritone substitutions
-category: music
+category: Music
 external_links:
     - title: B3Monaco.com
       link: 'http://www.b3monaco.com'
