@@ -17,10 +17,10 @@ $text-color:       #111;
 $background-color: #fdfdfd;
 $brand-color:      #2a7ae2;
 
-$grey-color:       #828282;
+$grey-color:       #505050;
 $grey-color-light: lighten($grey-color, 10%);
 $grey-color-dark:  darken($grey-color, 30%);
-$grey-color-very-light: lighten($grey_color, 42%);
+$grey-color-very-light: lighten($grey_color, 60%);
 
 // Width of the content area
 $content-width:    90%;
@@ -50,12 +50,7 @@ $on-laptop:        800px;
     "syntax-highlighting"
 ;
 
-a:link {color: $grey-color-dark;}
-a:visited {color: $grey-color-dark;}
-a:hover {color: $grey-color-light;} //text-decoration: none;}
-a:active {color: $grey-color-light;}
-
-.highlighter-rouge {color: $grey-color-dark;}
+.highlighter-rouge {color: $text-color;}
 
 .column {
     display: block;

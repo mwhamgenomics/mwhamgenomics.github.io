@@ -9,7 +9,6 @@ dl, dd, ol, ul, figure {
 }
 
 
-
 /**
  * Basic styling
  */
@@ -24,7 +23,6 @@ body {
     font-feature-settings: "kern" 1;
     font-kerning: normal;
 }
-
 
 
 /**
@@ -81,7 +79,6 @@ li {
 }
 
 
-
 /**
  * Headings
  */
@@ -90,21 +87,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-
 /**
  * Links
  */
 a {
-    color: $brand-color;
+    color: $grey-color;
     text-decoration: none;
 
-    &:visited {
-        color: darken($brand-color, 15%);
+    &:hover {
+        color: $grey-color-light;
+        text-decoration: underline;
     }
 
-    &:hover {
-        color: $text-color;
-        text-decoration: underline;
+    &:visited {
+    }
+
+    &:active {
+        text-decoration: none;
     }
 }
 
@@ -113,6 +112,7 @@ div[class="post-content"] a {
     text-decoration: underline;
 
 }
+
 
 /**
  * Blockquotes
@@ -129,7 +129,6 @@ blockquote {
         margin-bottom: 0;
     }
 }
-
 
 
 /**
@@ -181,7 +180,6 @@ pre {
 }
 
 
-
 /**
  * Clearfix
  */
@@ -193,7 +191,6 @@ pre {
         clear: both;
     }
 }
-
 
 
 /**
