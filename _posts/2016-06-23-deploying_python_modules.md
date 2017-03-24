@@ -134,11 +134,10 @@ version.txt:
     0.1
 
 tag_project.sh:
-{% highlight bash %}
-version=$(cat version.txt)
-git tag $version
-git push --tags
-{% endhighlight %}
+
+    version=$(cat version.txt)
+    git tag $version
+    git push --tags
 
 Setting the version in \_\_init\_\_.py doesn't actually change that much - we just need to parse out the expression that sets `__version__`.
 
@@ -148,12 +147,10 @@ __version__ = 0.1
 {% endhighlight %}
 
 tag_project.sh:
-{% highlight bash %}
-# note: this won't work if __version__ is set more than once in the project's code
-version="$(grep -rh '__version__ = ' $(pwd) | sed 's/\(__version__\) = \(.*\)/\2/' | sed "s/\'//g")"
-git tag $version
-git push --tags
-{% endhighlight %}
+    # note: this won't work if __version__ is set more than once in the project's code
+    version="$(grep -rh '__version__ = ' $(pwd) | sed 's/\(__version__\) = \(.*\)/\2/' | sed "s/\'//g")"
+    git tag $version
+    git push --tags
 
 
 ### A quick note on version naming

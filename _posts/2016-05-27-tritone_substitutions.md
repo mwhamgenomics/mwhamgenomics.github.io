@@ -27,7 +27,7 @@ The tritone substitution has an interesting sound and useful underlying theory. 
 That, essentially, is the tritone substitution. It's a simple enough concept, but has many uses for adding suspense and variation to the music you make.
 
 ### Adding more notes
-Let's stay with the example of F blues, substituting an F7 for a B7. At this point, the notes being played are B, Eb and A (you can add an F# if you like to get the 5th). As ever, there are various notes you can add on top of basic chords to extend them, for example a G# to create a B7 with a 13th. There's not too much going on there, until you look at the chord that it's substituting for. You're playing the notes B, Eb, A, G# (ideally without the A and G# right next to each other), which is indeed B7 with a 13th, but if you remove the substitution and revert the bass note from B back to F, it becomes F7 with a raised 9th, or F7#9. 13th chords are commonplace in jazz, and raised 9ths are useful because they bridge the gap between major and minor tonality, and can give a nice moody feel to a blues. Therefore, tritone subs allow you to alternate between 13th chords and raised 9th chords, so if you can play one, you can play the other.
+Let's stay with the example of F blues, substituting an F7 for a B7. At this point, the notes being played are B, Eb and A (you can add an F# if you like to get the 5th). As ever, there are various notes you can add on top of basic chords to extend them, for example a G# to create a B7 with a 13th. There's not too much going on there, until you look at the chord that it's substituting for. You're playing the notes B, Eb, A, G# (ideally without the A and G# right next to each other), which is indeed B7 with a 13th, but if you remove the substitution and revert the bass note from B back to F, it becomes F7 with a raised 9th, or F7#9. 13th chords are commonplace in jazz, and raised 9ths are useful because they bridge the gap between major and minor tonality, and can give a nice moody feel to a blues. Therefore, tritone subs allow you to alternate between 13th chords and raised 9th chords - if you can play one, you can play the other.
 
 The 5th is equally as capable as the Root of creating a tritone substitution. Consider the following bass line:
 
@@ -39,7 +39,7 @@ In the fourth bar, instead of an F7 with a Root bass note (F A Eb), the band is 
 As you can see, you can fiddle about endlessly with chord extensions, and you can do this with the assurance that any extensions you add to a chord will still translate into something meaningful even if you tritone-sub it.
 
 ### Blues for Alice
-Of course tritone substitutions don't have to be spontaneous - they can be written into the chord changes. Take Charlie Parker's Blues for Alice:
+Of course tritone substitutions don't have to be spontaneous - they can be written into the chord changes. Take the chords for Charlie Parker's Blues for Alice:
 
     | F     | Em7b5  A7  | Dm7 G7  | Cm7  F7  |
     | Bb7   | Bbm7   Eb7 | Am7 D7  | Abm7 Db7 |
@@ -59,4 +59,4 @@ Let's have a look at the first few bars of Keith Jarrett's tune Lucky Southern:
 
 Again, you naturally expect a II-V-I turnaround in bars 6-7, i.e. Em7, A7, D. Instead however, the Em7 is traded for a Bb7, giving a downward chromatic progression to the A7. Then in the 8th bar, you naturally expect a V chord (A7) to get a perfect cadence leading into the next D chord. However, instead Jarrett flattens the 5th (as is the fashion with those trendy modern Jass players) to get A7b5, and then tritone-subs the bass note to get an Eb7b5!
 
-Overall, tritone substitutions are useful in any form of modern popular or classical music. They can be written or ad-lib, and the thought processes behind them can be as simple as 'leading down' into chord IV in the bass line, or complex above and beyond what is discussed here. They provide a useful layer of abstraction to those trying to add interesting chord extensions to their music, and help lift the harmonies, allowing the musician to add suspense and unpredictability to the listener's experience.
+Tritone subs are useful in any form of modern popular or classical music. They can be written or ad-lib, and the thought processes behind them can be as simple as 'leading down' into chord IV in the bass line, or complex above and beyond what is discussed here. They provide a useful layer of abstraction to those trying to add interesting chord extensions to their music, and help lift the harmonies, allowing the musician to add suspense and unpredictability to the listener's experience.
