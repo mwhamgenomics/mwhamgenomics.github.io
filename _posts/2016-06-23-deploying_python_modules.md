@@ -2,7 +2,7 @@
 layout: post
 title: Deploying and versioning Python projects
 category: Programming
-tags: ['Python']
+tags: ['Python', 'environment']
 external_links:
     - title: Pip documentation
       link: 'https://pip.pypa.io'

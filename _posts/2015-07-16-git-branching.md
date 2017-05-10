@@ -3,7 +3,7 @@ layout: post
 title:  "Git branching"
 date:   2015-07-16 16:22:59 +0000
 category: Programming
-tags: ['version control']
+tags: ['version control', 'environment']
 ---
 
 If multiple people are working on a Git project, they should ideally not work directly on the master branch. Instead, when they want to add something to the project, they should create a separate branch on which they make changes, test, debug, etc, and and then merge that branch back to master when ready. This way, the master is always fully functional. Modern development environments often have functionality to aid version control and branching, but this post aims to discuss how to use branches via the plain command line.
@@ -29,6 +29,7 @@ You can work on this branch, committing and pushing changes. Then when you think
 
 ### Pull request
 It's usually a good idea to assign the request to someone else for peer review. The person reviewing the request can then discuss it with you, request further changes, and then close or approve it.
+
 ### Merge conflicts
 Merging of two branches can usually be done automatically by Git, and is done automatically when a pull request is approved. However, it can get complicated if there are merge conflicts, which usually arise when your branch and the master has diverged (e.g. someone else merges their branch to the master just before you). A GitHub pull request should show whether you have merge conflicts. To fix merge conflicts, while in your branch, run:
 
