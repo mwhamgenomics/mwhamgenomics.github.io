@@ -3,68 +3,103 @@
 ---
 @charset "utf-8";
 
-
-// Our variables
-$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$base-font-size:   14px;
-$base-font-weight: 400;
-$small-font-size:  $base-font-size * 0.8;
-$base-line-height: 1.5;
-
-$spacing-unit:     20px;
-
-$text-color:       #111;
-$background-color: #fdfdfd;
-$brand-color:      #2a7ae2;
-
-$grey-color:       #505050;
-$grey-color-light: lighten($grey-color, 10%);
-$grey-color-dark:  darken($grey-color, 30%);
-$grey-color-very-light: lighten($grey_color, 60%);
-
-// Width of the content area
-$content-width:    90%;
-
-$on-palm:          600px;
-$on-laptop:        800px;
-
-
-// Use media queries like this:
-// @include media-query($on-palm) {
-//     .wrapper {
-//         padding-right: $spacing-unit / 2;
-//         padding-left: $spacing-unit / 2;
-//     }
-// }
-@mixin media-query($device) {
-    @media screen and (max-width: $device) {
-        @content;
-    }
-}
-
-
 // Import partials from `sass_dir` (defaults to `_sass`)
-@import
-    "base",
-    "layout",
-    "syntax-highlighting"
-;
+@import "syntax-highlighting";
 
-.highlighter-rouge {color: $text-color;}
-
-.column {
-    display: block;
-    float: left;
-    padding-right: 10px;
-    padding-left: 10px
+body {
+    font-family: "Helvetica";
+    font-size: 14px;
 }
 
-.one-third {
-    width: 33%
+ul {
+    margin-left: 0;
 }
 
-.two-thirds {
-    width: 66%
+h1 {
+    font-size: 28px;
+}
+
+h2 {
+    font-size: 22px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+pre, code .highlighter-rouge {
+    color: #333;
+    border: none;
+    font-size: 12px;
+    background-color: #f5f5f5;
+}
+
+blockquote {
+    font-size: 14px;
+    color: #505050;
+    font-style: italic;
+}
+
+.well {
+    margin-top: 12px;
+}
+
+.well > h4 {
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.link-list {
+    padding-left: 0;
+    list-style: none;
+}
+
+.post-link {
+    display: inline;
+}
+
+.post-meta {
+    color: #505050;
+    font-size: 12px;
+    line-height: 1;
+}
+
+a.post-meta {
+    color: #337ab7;
+}
+
+.wrapper {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+
+.navbar-brand > img {
+    display: inline;
+}
+
+.navbar {
+    background-color: rgb(34, 34, 34);
+    background-image: linear-gradient(rgb(60, 60, 60) 0px, rgb(34, 34, 34) 100%);
+    font-weight: lighter;
+}
+
+.site-header, .site-footer {
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.site-footer {
+    text-align: center;
+    font-size: 75%;
+}
+
+.highlighter-rouge {
+    color: #333;
+    background-color: #f5f5f5
 }
 
 .fig {

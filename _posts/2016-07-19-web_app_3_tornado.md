@@ -17,7 +17,7 @@ external_links:
 
 Having developed a database/API/front-end stack for the Edinburgh Genomics reporting app, we had to set it up on a webserver so that people could access it. To do this, we settled on Tornado, an all-Python webserver that allowed us to easily connect up our Flask/Eve apps and set them up with logging and seamless reloading.
 
-### Webserver script
+## Webserver script
 Firstly, we needed a script to start up Tornado with our apps loaded:
 
 `run_app.py`:

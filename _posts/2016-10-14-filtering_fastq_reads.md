@@ -65,17 +65,17 @@ To solve this problem, we initially used a program called [Sickle](https://githu
 Sickle took about 90 mins to process a pair of 4 Gb example fastq files. In an attempt to optimise this stage, we decided to try rolling our own fastq filterer.
 
 
-### Implementation
+## Implementation
 Firstly, we introduced another control alongside Sickle. A Python implementation of the functionality described above took about 4.5 hours to process the aforementioned pair of 4 Gb fastqs. Now we know that Sickle may be slow, but not that slow! However, having implemented the necessary logic ourselves, we now know how to solve the problem - it's just a matter of optimising for speed.
 
 
-### C
+## C
 We decided to try a different implementation of the above Python script in C. Despite the popularity of high level languages like Python, Perl, R, etc. in bioinformatics, C has retained popularity where it's important to be able to fly through a huge text file at high speed. Our C program would have a series of relatively simple tasks: read in a pair of corresponding reads from two fastq files, check both sequences and, if both were long enough, add them to a pair of corresponding output files.
 
 Firstly, we had to stream in GZ compressed data from two fastq files (since data files are almost always compressed in bioinformatics), and then read that uncompressed data in line by line. This is possible using functions from C's `zlib` library, and is discussed in the companion article on C.
 
 
-### Compressing output data
+## Compressing output data
 Because data files are usually GZ compressed, our script needs to be able to output `fastq.gz` files. Once again, `zlib` is capable of this, however when we ran it, it turned out to be about the same speed as Sickle, despite not doing any of Sickle's sliding windows or quality filtering! Clearly, our original sliding-window-slowdown hypothesis was wrong, and the rate-limiting step was something else.
 
 We next tried removing data compression/decompression from the script (i.e, reading and writing uncompressed fastqs), which improved performance significantly. It turned out that the rate-limiting step in our C script was compression of output data. Fortunately, it is possible to compress data in parallel with a multi-threaded version of `gz`: [Pigz](https://github.com/madler/pigz) by Mark Adler, co-developer of `zlib`. If we could output uncompressed data from our script and pipe that into Pigz, we might be able to get some good results.
@@ -83,7 +83,7 @@ We next tried removing data compression/decompression from the script (i.e, read
 The number of output files meant that we couldn't use simple Unix pipes, however Bash has solutions for this, as discussed in the companion article on Bash IO.
 
 
-### Conclusions
+## Conclusions
 Our fastq filterer now reads in GZ compressed data with `zlib`, does read length filtering, and then uses Bash constructs to write compressed output data via Pigz. Using this approach, we were able to get the processing time for a pair of 4 Gb fastqs down from an hour and a half to about 5 minutes.
 
 This improvement in performance was less dramatic when working with full-size test files, however we still found the script to run in about 1/5th or 1/6th of the time Sickle was taking. As of this writing, we are now working to integrate this new C script into our pipeline, allowing us to filter fastq reads much more quickly than before.

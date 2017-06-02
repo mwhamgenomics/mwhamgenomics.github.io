@@ -9,8 +9,8 @@
   <p class="post-meta"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span></p>
   {% endif %}
 
-  {% if page.categories != null %}
-  <p class="post-meta">Categories: <span>{% include comma_sep_links.html links=page.categories type='categories' %}</span></p>
+  {% if page.category != null %}
+  <p class="post-meta">Category: <a href="/{{ page.category }}">{{ page.category }}</a></p>
   {% endif %}
 
   {% if page.tags != null %}

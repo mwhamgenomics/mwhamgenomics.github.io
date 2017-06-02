@@ -7,12 +7,10 @@
 
 # Site settings
 title: mwhamgenomics.github.io
-# email: your-email@domain.com
 description: >  # ignore newlines until "baseurl:"
   Biology, programming, music.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://mwhamgenomics.github.io" # the base hostname & protocol
-# twitter_username: jekyllrb
 github_username:  mwhamgenomics
 
 # Build settings

@@ -22,7 +22,7 @@ Keeping track of modules per project also has its challenges. You might keep a f
 
 Fortunately, there's a proper way of doing it all: virtualenv.
 
-### virtualenv
+## virtualenv
 Virtualenv is a Python module that allows you to set up isolated instances of Python, each with their own executables and libraries. Simply install it on one Python instance, and use that as a 'master' for setting up virtualenvs:
 
     mwhamgenomics$ pip install virtualenv

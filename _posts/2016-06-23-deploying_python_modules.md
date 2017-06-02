@@ -16,7 +16,7 @@ For all of Python's simplicity and intuitiveness at the point of development, ma
 
 (Note: this post will not discuss publishing projects to PyPi. It will, however, discuss deploying modules from version control)
 
-### Installing a module to a Python interpreter
+## Installing a module to a Python interpreter
 During the development of one of the open-source projects for Edinburgh Genomics, I used a fairly clean way of running a command-line app through an executable entry point. You would have a structure like...
 
     A_Project/
@@ -109,7 +109,7 @@ The `setup` function is still there, but with a few differences. Firstly instead
 
 A project with a setup.py like this can be installed via `python setup.py install` or through pip. Upon doing so, your module will be installed to the Python interpreter's `site-packages`, at last giving a strong link between the module and the interpreter.
 
-### Installing via version control
+## Installing via version control
 Installing your own module via pip sounds great, but you may have noticed a stumbling point. Pip goes through the Python Package Index! There are two ways around this. The first is to submit your project to PyPi, which is beyond the scope of this post. The second is to use pip's version control support. As of this writing, the latest version of pip supports Git, Mercurial, SVN and Bazaar. All of these have support for installing particular tagged versions, as documented [here](https://pip.pypa.io/en/latest/reference/pip_install/#vcs-support). If a dependency is available on Github, you can point to it thus:
 
     git+https://github.com/<organisation>/<project_name>.git@<tag_version>
@@ -118,7 +118,7 @@ The requirements.txt file for Analysis-Driver, for example, points to a dependen
 
     pip install git+https://github.com/<organisation>/<project_name>.git@<tag_version>
 
-### Beware top-level files - the project vs the module
+## Beware top-level files - the project vs the module
 It's important to bear in mind that what you have in version control is not the same as what will be deployed into `site-packages`. In the above example, the versioned project is called EGCG-Core but the module given to `setup` in `packages=` is `egcg_core`. This means that your module cannot depend on any top-level files in the project, because they won't actually be installed. For example, EGCG-Core used to have the following structure:
 
     EGCG-Core/
@@ -147,6 +147,7 @@ __version__ = 0.1
 {% endhighlight %}
 
 tag_project.sh:
+
     # note: this won't work if __version__ is set more than once in the project's code
     version="$(grep -rh '__version__ = ' $(pwd) | sed 's/\(__version__\) = \(.*\)/\2/' | sed "s/\'//g")"
     git tag $version

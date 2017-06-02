@@ -23,7 +23,7 @@ def main_page():
 
 Visit the top level of this app in a web browser and you will see the text 'This is a main page'. Of course, this is not very useful. We could have the function return html content, but it would be a hugely horrible function if we tried to render a full html-formatted web page. If we want to do that, it's best to use templates.
 
-### HTML templates
+## HTML templates
 
 Flask's template rendering is done via Jinja2, and allows you to render dynamic html pages:
 
@@ -90,7 +90,7 @@ templates/second_page.html:
 
 Here, base.html contains a default <head>, allowing css styling to be included in all sub-templates. Each sub-template implements a `title` block, which will be inserted into the `<title>` element of the base template. `main_page` will have the base's `content` block plus some of its own stuff, and `second_page` completely overrides `content`. Text can be added into `second_page` by Flask with `flask.render_template('second_page.html', text='Some text to add')`.
 
-### User input
+## User input
 While visiting websites, you may have noticed that the URL of the page sometimes has a `?` followed by a series of `x=y` key-value pairs. This is the query string, and is accessible to Flask via `flask.request`:
 
 {% highlight python %}

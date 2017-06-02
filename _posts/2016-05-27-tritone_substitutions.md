@@ -26,7 +26,7 @@ The tritone substitution has an interesting sound and useful underlying theory. 
 
 That, essentially, is the tritone substitution. It's a simple enough concept, but has many uses for adding suspense and variation to the music you make.
 
-### Adding more notes
+## Adding more notes
 Let's stay with the example of F blues, substituting an F7 for a B7. At this point, the notes being played are B, Eb and A (you can add an F# if you like to get the 5th). As ever, there are various notes you can add on top of basic chords to extend them, for example a G# to create a B7 with a 13th. There's not too much going on there, until you look at the chord that it's substituting for. You're playing the notes B, Eb, A, G# (ideally without the A and G# right next to each other), which is indeed B7 with a 13th, but if you remove the substitution and revert the bass note from B back to F, it becomes F7 with a raised 9th, or F7#9. 13th chords are commonplace in jazz, and raised 9ths are useful because they bridge the gap between major and minor tonality, and can give a nice moody feel to a blues. Therefore, tritone subs allow you to alternate between 13th chords and raised 9th chords - if you can play one, you can play the other.
 
 The 5th is equally as capable as the Root of creating a tritone substitution. Consider the following bass line:
@@ -38,7 +38,7 @@ In the fourth bar, instead of an F7 with a Root bass note (F A Eb), the band is 
 
 As you can see, you can fiddle about endlessly with chord extensions, and you can do this with the assurance that any extensions you add to a chord will still translate into something meaningful even if you tritone-sub it.
 
-### Blues for Alice
+## Blues for Alice
 Of course tritone substitutions don't have to be spontaneous - they can be written into the chord changes. Take the chords for Charlie Parker's Blues for Alice:
 
     | F     | Em7b5  A7  | Dm7 G7  | Cm7  F7  |
@@ -50,7 +50,7 @@ This tune makes some clever uses of chord patterns to the point that it almost i
     | Bbm7   Eb7    Am7  D7     Abm7  Db7   Gm7
     | Db/Ab  Db/G | C/G  C/F# | B/F#  B/F | Bb/F ...
 
-### Lucky Southern
+## Lucky Southern
 Let's have a look at the first few bars of Keith Jarrett's tune Lucky Southern:
 
     | D     |        | E7     |        |

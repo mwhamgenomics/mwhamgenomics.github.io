@@ -18,7 +18,7 @@ We could have had the front end website query the database directly, however thi
 
 Eve is a Flask-based Rest API library. This gave us an HTTP-based interface to the database and a very flexible schema for data flowing in. This allowed us to validate the data being stored while also being able to add new types of data over time without migrating the database.
 
-### Eve
+## Eve
 Being an extension of Flask, Eve is fairly familiar to install and configure:
 
 {% highlight python %}
@@ -138,7 +138,7 @@ Having pushed some data, we should be able to visit the endpoint and see somethi
 
 Now things make a little more sense. The information you have pushed to the database is now stored in `data` as a list of dicts. Eve adds some metadata to the content, such as how much data is in the endpoint, as well as some information on pagination. If there's too much data for one page, you can visit the next page by visiting `http://localhost:4889/api/0.1/an_endpoint?max_results=25&page=2`. Eve's [documentation](http://python-eve.org) contains complete information on Eve's capabilities.
 
-### Simple aggregation
+## Simple aggregation
 Eve is certainly not lacking for features. It's possible to filter, sort, limit which JSON fields are returned, control pagination, and embed data from other endpoints, all of which is useful to the web app front end. However, the one thing that Eve doesn't really do (as of version 0.6) is aggregation.
 
 At first, we were able to use Eve's event hook system. For a given endpoint, it is possible to register a function to the app to modify the data being returned on the fly. In our case, we could register a function that would add calculated fields to each JSON element being returned:
@@ -156,7 +156,7 @@ app.on_post_GET_an_endpoint += add_calculated_field  # register the function
 
 This allows us to aggregate on the fly rather than store aggregated data, which was something that we didn't want to do. However, because these fields were being added after filtering, it was not possible to filter data based on calculated fields. To do that, we need to use MongoDB's own aggregation, which has an extensive range of logic/aggregation functions, allowing you to pass returned data through a pipeline.
 
-### Pipeline aggregation
+## Pipeline aggregation
 It is possible to aggregate in PyMongo or the MongoDB shell with a `list[dict]` pipeline. Here's a relatively simple example:
 
 {% highlight python %}

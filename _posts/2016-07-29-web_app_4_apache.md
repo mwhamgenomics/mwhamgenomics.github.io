@@ -24,7 +24,7 @@ Apache is one of the most popular HTTP servers on the internet. It's very full-f
 
 Here, then, are my experiences in setting up multiple Flask apps side by side via mod_wsgi on an Apache server. All of this was done on the CentOS 7 distribution of Linux. Depending on your OS, files may have different names and/or locations, but the gist of it remains the same.
 
-### Installing Apache and mod_wsgi
+## Installing Apache and mod_wsgi
 Apache is listed in most major Linux package managers as various names, including 'Apache2' and 'httpd'. On CentOS:
 
     # yum install httpd
@@ -40,7 +40,7 @@ This creates a `mod_wsgi.so` file in `/etc/httpd/modules` and a config file in `
     LoadModule wsgi_module /etc/httpd/modules/mod_wsgi.so
 
 
-### Configuring Apache
+## Configuring Apache
 When Apache starts up, it scans its `/etc` folder for config files and loads them. To add a configuration for our two apps, then, we just need to add a new `.conf` file.
 
 /etc/httpd/conf.d/app.conf:
@@ -65,7 +65,7 @@ When Apache starts up, it scans its `/etc` folder for config files and loads the
 Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the running of multiple websites on one Linux server - probably not needed in this case, but it's generally good practice to use them. ServerName should be the url or IP address of the machine running the webserver, unless you have a DNS system that routes the url to your server. We now define the locations of two WSGI scripts (one for the Rest API and one for the web app) and register them to the paths `/api/v1` and `/` respectively. The order in which these are declared is important - `/api/v1` should be registered first or it will be seen as part of the web app registered to the root (`/`), and visiting `/api/v1` will not result in a request for the Rest API. Finally, we define a Directory allowing the server to find the `static` and `template` files required by the web app (the Rest API doesn't need any of this since it serves plain text).
 
 
-### WSGI scripts
+## WSGI scripts
 We've pointed mod_wsgi to the locations of some `.wsgi` scripts, but we haven't written them yet! In the same way we had scripts to set up our Flask apps for Tornado, these `.wsgi` scripts will do something similar for mod_wsgi. It's common practice to put web content in `/var/www`, so let's set up a directory structure there:
 
 {% highlight bash %}
@@ -97,11 +97,11 @@ from rest_api import app as application
 
 `rest_api.app`, in this case, is the Eve/Flask Rest API application. It's important, however, that we import it as `application` because mod_wsgi loads up this script, looks for something called `application` and loads it as the main bit of Python code to port to Apache.
 
-### Troubleshooting
+## Troubleshooting
 It would have been nice if everything had worked as is, but unfortunately I encountered some problems.
 
 
-#### Which Python?
+### Which Python?
 I needed to set up a Python 3 virtualenv, but nowhere in the documentation for mod_wsgi could I find a way of pointing it at the right Python interpreter. When I tried to run the app (as below), I got a series of cryptic error messages suggesting it was still trying to run the app with Python 2. After looking at the stacktraces, it appeared that something was amiss regarding the original mod_wsgi install.
 
 Enter the Python Packaging Index. Here we found an entry for mod_wsgi - a bit strange, as mod_wsgi is C, not Python. The reason it's there, though, is made clear on mod_wsgi's [PyPi page](https://pypi.python.org/pypi/mod_wsgi):
@@ -127,7 +127,7 @@ LoadModule wsgi_module '/path/to/python/virtualenv/site-packages/mod_wsgi/server
 
 Apache should now read this config file and load up the correct `mod_wsgi` and Python interpreter.
 
-#### Static libraries
+### Static libraries
 When setting up the central Python interpreter to create virtualenvs from, you may need to enable shared libraries, which you must then point to whenever you run it or any virtualenvs created from it. Setting LD_LIBRARY_PATH in your BashRC is simple enough, but you may also need to set it in the Apache config. At the top of `app.conf`:
 
     SetEnv LD_LIBRARY_PATH /path/to/Python/lib
@@ -136,12 +136,12 @@ When setting up the central Python interpreter to create virtualenvs from, you m
 As you can see, you may need to set a WSGIPythonHome as well so that mod_wsgi can call the Python interpreter and find its libraries.
 
 
-#### Authentication
+### Authentication
 If your apps implement server-side authentication, you may find some strange things happening on Apache. Initially, I was sending HTTP requests to the web app with some Auth headers, but in the logs I was seeing the app complaining that I supplied no credentials! It turns out that this is a result of a mod_wsgi config: by default, it doesn't pass on HTTP Auth headers to the Python app underneath. To allow this, simply add `WSGIPassAuthorization On` to your Apache config.
 
 Note, however, that mod_wsgi has this default behaviour for a reason - otherwise, it allows all your WSGI apps to see all Auth headers. Not such a concern here, but it could be a problem if you have many unconnected WSGI apps running on the same server - in this case, it would be better to handle authentication through Apache.
 
-#### Script reloading
+### Script reloading
 This was very simple in Tornado, but unfortunately isn't in Apache. Apache can be configured to automatically reload the WSGI app whenever the `.wsgi` script is updated (or `touch`-ed). When this happens, the `wsgi` script is re-run and import statements for the web app, submodules, etc are repeated as you'd expect. However, since the modules have already been imported into the Python interpreter, nothing happens, even though the code has changed! In this case, we need to explicitly tell the Python interpreter not only to import a module, but also to reload it. This is perfectly possible through `importlib`:
 
 {% highlight python %}
