@@ -2,7 +2,7 @@
 layout: post
 title: Building a web app part 1 - NoSQL and Eve
 category: Programming
-tags: ['Python', 'web development', 'reporting app']
+tags: ['python', 'web development', 'reporting app']
 external_links:
     - title: MongoDB documentation
       link: 'https://docs.mongodb.com'

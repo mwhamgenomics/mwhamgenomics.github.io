@@ -2,7 +2,7 @@
 layout: post
 title: Setting up virtual Python environments with virtualenv
 category: Programming
-tags: ['Python', 'environment']
+tags: ['python', 'environment']
 external_links:
     - title: Virtualenv documentation
       link: https://virtualenv.pypa.io

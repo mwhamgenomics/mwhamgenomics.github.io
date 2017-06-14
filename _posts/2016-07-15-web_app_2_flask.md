@@ -2,7 +2,7 @@
 layout: post
 title: Building a web app part 2 - Flask front end
 category: Programming
-tags: ['Python', 'web development', 'reporting app']
+tags: ['python', 'web development', 'reporting app']
 external_links:
     - title: Official Flask documentation.
       link: 'http://flask.pocoo.org'

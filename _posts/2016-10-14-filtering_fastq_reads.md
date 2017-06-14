@@ -2,6 +2,7 @@
 layout: post
 title: 'Filtering fastq reads: adventures in optimisation'
 category: Bioinformatics
+tags: ['python', 'c']
 external_links:
     - title: Sickle
       link: 'https://github.com/najoshi/sickle'
