@@ -20,9 +20,8 @@ Having developed a database/API/front-end stack for the Edinburgh Genomics repor
 ## Webserver script
 Firstly, we needed a script to start up Tornado with our apps loaded:
 
-`run_app.py`:
 {% highlight python %}
-
+# run_app.py:
 p = argparse.ArgumentParser()
 p.add_argument('app', choices=['reporting_app', 'rest_api'])
 p.add_argument('--port', type=int)
@@ -53,9 +52,8 @@ The important part is the last four lines. Tornado works in a similar way to the
 
 We can now use this script to run each of our Flask apps, then navigate to the appropriate port on the hosting machine and see the running web app. However, this is not an ideal scenario: by now, you'll have three SSH terminals open, which must stay running for as long as you want the app to be available. It's possible to solve this problem by running the terminals in a Screen session, but a more reliable way is to detach the processes from the terminal. We did this simply by rolling our own. For `rest_api`:
 
-rest_api.sh:
 {% highlight bash %}
-
+# rest_api.sh:
 case $1 in
     start)
         if [ -n pids/rest_api.* ]

@@ -33,8 +33,9 @@ def main_page():
     return flask.render_template('main_page.html')
 {% endhighlight %}
 
-templates/main_page.html:
+
 {% highlight html %}{% raw %}
+<!-- templates/main_page.html: -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -49,8 +50,9 @@ templates/main_page.html:
 
 Of course we don't want to have to write all of this boilerplate for every page we want. Ideally we would structure it like classes - a base template, with sub-templates that inherit from it. Let's add another page, and add some Jinja2 syntax to the templates.
 
-templates/base.html:
+
 {% highlight html %}{% raw %}
+<!-- templates/base.html: -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -68,8 +70,8 @@ templates/base.html:
 </html>
 {% endraw %}{% endhighlight %}
 
-templates/main_page.html:
 {% highlight html %}{% raw %}
+<!-- templates/main_page.html: -->
 {% extends 'base.html' %}
 {% block title %}Main page{% endblock %}
 {% block content %}
@@ -78,8 +80,8 @@ templates/main_page.html:
 {% endblock %}
 {% endraw %}{% endhighlight %}
 
-templates/second_page.html:
 {% highlight html %}{% raw %}
+<!-- templates/second_page.html: -->
 {% extends 'base.html' %}
 {% block title %}Another page{% endblock %}
 {% block content %}

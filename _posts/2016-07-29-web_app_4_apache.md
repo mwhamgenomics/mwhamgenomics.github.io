@@ -43,8 +43,7 @@ This creates a `mod_wsgi.so` file in `/etc/httpd/modules` and a config file in `
 ## Configuring Apache
 When Apache starts up, it scans its `/etc` folder for config files and loads them. To add a configuration for our two apps, then, we just need to add a new `.conf` file.
 
-/etc/httpd/conf.d/app.conf:
-
+    # /etc/httpd/conf.d/app.conf
     <VirtualHost *:80>
         ServerName <url of hosting server>
         WSGIDaemonProcess reporting_app
@@ -68,17 +67,14 @@ Here, we create a VirtualHost on port 80. A VirtualHost allows you to manage the
 ## WSGI scripts
 We've pointed mod_wsgi to the locations of some `.wsgi` scripts, but we haven't written them yet! In the same way we had scripts to set up our Flask apps for Tornado, these `.wsgi` scripts will do something similar for mod_wsgi. It's common practice to put web content in `/var/www`, so let's set up a directory structure there:
 
-{% highlight bash %}
-/var/www/Web-App/
-    config.yaml
-    wsgi/
-        rest_api.wsgi
-        web_app.wsgi
-    app/
-        <versions>  # tagged versions of the reporting app codebase
-        production/  # symlink to current production codebase
-
-{% endhighlight %}
+    /var/www/Web-App/
+        config.yaml
+        wsgi/
+            rest_api.wsgi
+            web_app.wsgi
+        app/
+            <versions>  # tagged versions of the reporting app codebase
+            production/  # symlink to current production codebase
 
 Now let's write a WSGI script:
 

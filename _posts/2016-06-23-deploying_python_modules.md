@@ -129,32 +129,32 @@ It's important to bear in mind that what you have in version control is not the 
 
 \_\_init\_\_.py used to set a variable called `__version__` by parsing version.txt. This worked fine when the module was run from source, but not when run as a setup.py installation, as `version.txt` was not installed with `egcg_core`. There are ways of specifying data files to be installed along with the module, but it's far easier and cleaner in this case to just set `__version__` directly in \_\_init\_\_.py. The reason we used a version.txt originally was so we could parse the file for version information both at runtime and at the point of deploying a new Git tag via a versioning script.
 
-version.txt:
-
+    # version.txt
     0.1
 
-tag_project.sh:
-
-    version=$(cat version.txt)
-    git tag $version
-    git push --tags
+{% highlight bash %}
+# tag_project.sh
+version=$(cat version.txt)
+git tag $version
+git push --tags
+{% endhighlight %}
 
 Setting the version in \_\_init\_\_.py doesn't actually change that much - we just need to parse out the expression that sets `__version__`.
 
-\_\_init\_\_.py:
 {% highlight python %}
+# __init__.py
 __version__ = 0.1
 {% endhighlight %}
 
-tag_project.sh:
+{% highlight bash %}
+# tag_project.sh
+# note: this won't work if __version__ is set more than once in the project's code
+version="$(grep -rh '__version__ = ' $(pwd) | sed 's/\(__version__\) = \(.*\)/\2/' | sed "s/\'//g")"
+git tag $version
+git push --tags
+{% endhighlight %}
 
-    # note: this won't work if __version__ is set more than once in the project's code
-    version="$(grep -rh '__version__ = ' $(pwd) | sed 's/\(__version__\) = \(.*\)/\2/' | sed "s/\'//g")"
-    git tag $version
-    git push --tags
-
-
-### A quick note on version naming
+## A quick note on version naming
 GitHub's cofounder has some notes on semantic versioning [here](http://semver.org). I pretty much use the same naming system for versions.
 
 - dot-separated list of two or three numbers: `<major>.<minor>.<patch>`
@@ -162,4 +162,4 @@ GitHub's cofounder has some notes on semantic versioning [here](http://semver.or
 - the minor version changes when you add a new feature that doesn't break old stuff
 - the patch version changes when you add minor updates and fixes
 - GitHub recommends prepending 'v' to the version, e.g. 'v0.1.2'
-- Most of my projects have their major version as 0. Version 1.0.0 should be _really_ good, and likely to be useful to other people.
+- Most of my projects have their major version as 0. Version 1.0 should be _really_ good, and likely to be useful to other people.

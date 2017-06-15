@@ -5,18 +5,18 @@ category: Programming
 tags: ['bash', 'linux']
 ---
 
-Lately, I've been puzzling over a problem with [our fastq filtering process](/biology/2016/10/14/filtering_fastq_reads.html) at work. We recently added a new feature to our [fastq filterer](http://github.com/EdinburghGenomics/Fastq-Filterer) to write a text file with statistics of the data processing performed. When we ran this new version in production, though, we found that sometimes this stats file was not being written, even though the Slurm job running it was returning a 0 exit status. This prompted a long investigation that has been my primary source of annoyance over the past few weeks, but taught me something useful in the end.
+Lately, I've been puzzling over a problem with [our fastq filtering process](/bioinformatics/2016/10/14/filtering_fastq_reads.html) at work. We recently added a new feature to our [fastq filterer](http://github.com/EdinburghGenomics/Fastq-Filterer) to write a text file with statistics of the data processing performed. When we ran this new version in production, though, we found that sometimes this stats file was not being written, even though the Slurm job running it was returning a 0 exit status. This prompted a lengthy investigation that has been my primary source of annoyance over the past few weeks and made me question my own technical ability (and sanity) at various points, but taught me something useful in the end when I finally figured out the problem.
 
 ## Debugging
-My first idea was to check the fastq filterer itself for bugs - I'm not that experienced with C, after all. After a lengthy investigation with [Valgrind](/programming/2017/05/22/valgrind.html), I had much tidier memory management and reassurance that my C programming abilities aren't as shabby as I initially feared (in hindsight, how complicated and error-prone can writing to a file be?). I still had no answer, though, and I had to be sure that the randomly-disappearing stats files were not due to a problem in the script.
+My first idea was to check the fastq filterer itself for bugs - I wrote it after all, and I'm not that experienced with C. After a thorough debugging session with [Valgrind](/programming/2017/05/22/valgrind.html), I had much tidier memory management and reassurance that my C programming abilities aren't as shabby as I initially feared (in hindsight, how complicated and error-prone can writing to a file stream be?). I still had no answer, though, and I had to be sure that the randomly-disappearing stats files were not due to a problem in the script.
 
 ## Reimplementation
-I tried implementing the filterer in Python, and the problem remained. This acquitted the filterer of any wrongdoing. I then tried adding some debugging `print` statements into the script, and found something interesting: whenever a stats file failed to write, I was also getting print statements failing to work. It seemed that either the IO was getting cut off, or the job was getting killed.
+I tried re-implementing the filterer in Python, and the problem remained. This acquitted the filterer of any wrongdoing. I then tried adding some debugging `print` statements into the script, and found something interesting: whenever a stats file failed to write, I was also getting print statements failing to work. It seemed that either the IO was getting cut off, or the job was getting killed.
 
-I tried running this re-implemented script with `python -v`, which prints extra information about what the interpreter is doing. Surprisingly, whenever I got a failing stats file and print statements, I also got none of the cleanup messages I expected from the interpreter at the end of execution. Not only was the script seemingly getting stopped, the entire Python interpreter was crashing silently (Slurm was still returning an exit status of 0)! Clearly something funny was going on here, and it wasn't bugs in my code.
+I tried running this re-implemented script with `python -v`, which prints extra information about what the interpreter is doing. Surprisingly, whenever I got a failing stats file and print statements, I also got none of the cleanup messages I expected from the interpreter at the end of execution. Not only was the script seemingly getting stopped, the entire Python interpreter was crashing silently! Clearly something funny was going on here, and it wasn't bugs in my code.
 
 ## Narrowing it down
-Since stats files were only failing to write occasionally, my boss suggested that it was a race condition. Race conditions occur when concurrent threads or processes don't complete in the correct order - two threads 'race' to completion and if the wrong one finishes first, weird things happen. I tried putting some `sleep` statements around the code that wrote my stats file, which made the problem occur every single time. This may not sound like an improvement, but we are now one step closer to identifying the problem.
+Since stats files were only failing to write occasionally, my boss suggested that it was a race condition. Race conditions occur when concurrent threads or processes don't complete in the correct order - two threads 'race' to completion and if the wrong one finishes first, weird things happen. I tried putting some `sleep` statements around the code that wrote the stats file, which made the problem occur every single time. This may not sound like an improvement, but we are now one step closer to identifying the problem.
 
 The next step was to eliminate more factors from the environment in which we were running the fastq filtering. The problem did not occur in a plain Bash session, so it was something to do with Slurm. The script was being called inside a complex bit of Bash syntax including the use of `set -e`, the removal of which did not affect anything. Our filtering process made use of [Unix named pipes](/programming/2016/11/28/bash_io.html) for GZ compression of output data on the fly, and if we removed this, the problem did not occur. When we tried moving all `fclose()` calls to the very end of the filter script, the problem also did not occur. At this point, it looked like the problem was something to do with the way Slurm handles the closing of named pipes (although it turned out not to be).
 
@@ -69,10 +69,8 @@ In this case, the problem was a result of using Bash child processes incorrectly
 
 Let's apply this to the situation we had with the fastq filterer:
 
-fastq_filterer.slurm
 {% highlight bash %}
 mkfifo r1_filtered.fastq; mkfifo r2_filtered.fastq
-
 ./fastq_filterer --threshold 36 --i1 r1.fastq.gz --i2 r2.fastq.gz --o1 r1_filtered.fastq --o2 r2_filtered.fastq &
 pigz -c r1_filtered.fastq > r1_filtered.fastq.gz &
 pigz -c r2_filtered.fastq > r2_filtered.fastq.gz
@@ -90,7 +88,6 @@ pigz -c r2_filtered.fastq > r2_filtered.fastq.gz &  # we can now run everything 
 wait  # with no arguments, this will wait for all child processes
 {% endhighlight %}
 
-## A more elaborate fix
 The addition of a simple four-character command at the end of the script does solve the problem, but we wanted to be able to look at the exit status of each child process. To do this, we would need to capture the pid of each process with `$!` and wait on them explicitly:
 
 {% highlight bash %}
@@ -112,5 +109,6 @@ pigz_r2_exit_status=$?
 It doesn't matter which order you wait for the pids, because you can still call `wait` on a child process after it's finished, and even call it multiple times. I couldn't find any discussion of this subject online, so hopefully this will be an aid to anyone encountering problems with parallel processes within distributed compute jobs. To conclude:
 
 - To find the cause of a problem, try to eliminate as many external factors as possible from your testing
+- When you encounter a particularly confusing problem such as this one, the solution is often extremely simple
 - When something randomly fails, it may be a race condition, in which case `sleep` statements can be useful in finding the cause
-- _Always_ wait on your child processes.
+- Always wait on your child processes.
