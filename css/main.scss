@@ -69,12 +69,15 @@ a.post-meta {
 }
 
 .wrapper {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
+    padding-left: 3%;
+    padding-right: 4%;
+    margin-left: 0;
+    margin-right: 0;
 }
 
+.navbar-brand {
+    white-space: nowrap;  // screw you, Firefox.
+}
 
 .navbar-brand > img {
     display: inline;
@@ -115,4 +118,9 @@ a.post-meta {
 .fig > svg > line {
     stroke: black;
     stroke-width: 1;
+}
+
+.music {
+    margin-left: -4px;
+    margin-right: -4px;
 }

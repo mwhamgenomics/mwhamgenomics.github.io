@@ -6,9 +6,10 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: mwhamgenomics.github.io
+title: Genomics in B<span class="music">♭</span>
 description: >  # ignore newlines until "baseurl:"
-  Biology, programming, music.
+  <i class="fa fa-flask"></i> Biology, <i class="fa fa-terminal"></i> programming, <i class="fa fa-music"></i> music.
+plain_description: Biology, progamming, music.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://mwhamgenomics.github.io" # the base hostname & protocol
 github_username:  mwhamgenomics
