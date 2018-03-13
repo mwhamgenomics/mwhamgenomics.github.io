@@ -18,9 +18,9 @@ GCC's documentation claimed that downloading the source code for these into subd
 Eventually, I found that all of this tedious manual downloading isn't actually necessary, as GCC provides a script in `contrib/download_prerequisites` which will not only automatically download and link GMP, MPC and MPFR, but also the correct versions of them.
 
 ## Segfaults
-Having resolved dependencies properly, I then hit a problem with segfaults during the compilation process. At this point, we are in a strange fractal scenario, where we are trying to compile a version of GCC with another pre-existing version of GCC. After a bit of reading, I found that said pre-existing GCC on OSX... isn't actually GCC. It is, in fact, Clang pretending to be GCC. I was able to resolve the segfaults I'd been getting by setting an environment variable:
+Having resolved dependencies properly, I then hit a problem with segfaults during the compilation process. At this point, we are in a strange fractal scenario, where we are trying to compile a version of GCC with another pre-existing version of GCC. After a bit of reading, I found that said pre-existing GCC on OSX... isn't actually GCC. It is, in fact, Clang pretending to be GCC! I was able to resolve the segfaults I'd been getting by setting an environment variable:
 
-    export MACOSX_DEPLOYMENT_TARGET=10.9
+    [mwhamgenomics]$ export MACOSX_DEPLOYMENT_TARGET=10.9
 
 This informs OSX's developer tools of the minimum version of OSX required. The underlying function of this environment variable is still a bit of a mystery to me, but as far as I can tell, it allows libraries to be linked in the right way for this old version of GCC - you'll notice later on that even having built GCC, it won't run (even `--version`) without this flag set.
 

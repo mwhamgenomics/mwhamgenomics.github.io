@@ -13,7 +13,7 @@ Imagine you are listening to a guitarist and a bass player accompanying a solois
      F7                                  Bb7
     |F A Bb B|C A Bb B|C D Eb E|F G Ab A|Bb...
 
-This is a fairly conventional way of playing jazz-inflected blues. The bass walks between the F and C (the Root and the 5th) on the first beat of each bar, arriving at a Bb to mark the first bar of chord IV in the F blues progression, Bb7.
+This is a fairly conventional way of playing a blues progression in jazz. The bass walks between the F and C (the Root and the 5th) on the first beat of each bar, arriving at a Bb to mark the first bar of chord IV, or Bb7.
 
 However, you notice that sometimes the bass player plays something slightly different on the last bar before moving to chord IV, instead playing:
 

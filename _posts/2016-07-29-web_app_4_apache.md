@@ -27,13 +27,13 @@ Here, then, are my experiences in setting up multiple Flask apps side by side vi
 ## Installing Apache and mod_wsgi
 Apache is listed in most major Linux package managers as various names, including 'Apache2' and 'httpd'. On CentOS:
 
-    # yum install httpd
+    [root]# yum install httpd
 
 This should both install and start the `httpd` service. Navigate to your hosting server (you don't need a port number because by default Apache runs on port 80, the port that web browsers visit for HTTP) and you should see a placeholder web page. This is an HTML page served according to an Apache configuration called `welcome.conf`, which can be found in `/etc/httpd/conf.d`. `conf.d` is the main folder you'll be working in for configuring Apache. `/etc/httpd/conf` contains the main `httpd.conf` config file, but you shouldn't normally need to edit it.
 
 Firstly, however, we need mod_wsgi. This is the module that allows WSGI-compatible web apps to run on Apache. At first, I tried installing it centrally:
 
-    # yum install httpd-mod_wsgi
+    [root]# yum install httpd-mod_wsgi
 
 This creates a `mod_wsgi.so` file in `/etc/httpd/modules` and a config file in `/etc/httpd/conf.modules.d`, which looks something like:
 

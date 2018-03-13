@@ -22,30 +22,32 @@ Keeping track of modules per project also has its challenges. You might keep a f
 
 Fortunately, there's a proper way of doing it all: virtualenv.
 
+(Edit: as of Python 3.3, there's a standard library module called `venv` which I didn't know about at the time I wrote this, but works in pretty much the same way.)
+
 ## virtualenv
 Virtualenv is a Python module that allows you to set up isolated instances of Python, each with their own executables and libraries. Simply install it on one Python instance, and use that as a 'master' for setting up virtualenvs:
 
-    mwhamgenomics$ pip install virtualenv
+    [mwhamgenomics]$ pip install virtualenv
 
 You can now call virtualenv in one of two equivalent ways:
 
-    mwhamgenomics$ virtualenv path/to/new_virtualenv
-    mwhamgenomics$ python -m virtualenv path/to/new_virtualenv
+    [mwhamgenomics]$ virtualenv path/to/new_virtualenv
+    [mwhamgenomics]$ python -m virtualenv path/to/new_virtualenv
 
 This will create an isolated instance of Python in the specified location. To use the new virtualenv, simply call the interpreter or any related executable (pip, etc.) in its `bin` dir. Any modules you install using the virtualenv's pip will be put in its `lib`, and any new executables created (e.g, py.test) will be put in its `bin`.
 
 You can also bind this virtualenv to your shell session by sourcing the `activate` script in `bin`:
 
-    mwhamgenomics$ which python
+    [mwhamgenomics]$ which python
     /usr/bin/python
-    mwhamgenomics$ source path/to/new_virtualenv/bin/activate
-    (new_virtualenv) mwhamgenomics$ which python
+    [mwhamgenomics]$ source path/to/new_virtualenv/bin/activate
+    (new_virtualenv) [mwhamgenomics]$ which python
     path/to/new_virtualenv/bin/python
-    (new_virtualenv) mwhamgenomics$ which pip
+    (new_virtualenv) [mwhamgenomics]$ which pip
     path/to/new_virtualenv/bin/pip
 
 You will notice that it modifies your command line with the virtualenv's name in brackets. You can also deactivate the virtualenv like so:
 
-    mwhamgenomics$ deactivate
+    [mwhamgenomics]$ deactivate
 
 In production, you would deploy your program with a virtualenv sitting somewhere alongside, with any necessary modules for running the program. By using isolated virtual Python instances, you can link a distinct Python instance to each of your projects, keeping your environment predictable, the machine clean, and the project insulated against system changes.

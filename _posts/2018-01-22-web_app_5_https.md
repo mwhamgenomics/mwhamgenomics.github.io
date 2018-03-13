@@ -37,19 +37,19 @@ self-signed certificate (after all, the most trustworthy party that can sign
 your certificate is yourself). Firstly we need an RSA private key. You might
 already have one, e.g. in `~/.ssh`, but you can generate a dedicated one with:
 
-    # openssl genrsa -out rsa_private.key 2048
+    [root]# openssl genrsa -out rsa_private.key 2048
 
 Once we have a private key, we can then generate a CSR (certificate signing
 request):
 
-    # openssl req -new -key rsa_private.key > server_name.csr
+    [root]# openssl req -new -key rsa_private.key > server_name.csr
 
 This enters an interactive prompt, asking you for metadata to be attached to
 the certificate, including your organisation name and location. This information
 appears in the resulting CSR file and is used to generate and sign a
 certificate:
 
-    # openssl x509 -in server_name.csr -out server_name.cert -req -signkey rsa_private.key -days 100
+    [root]# openssl x509 -in server_name.csr -out server_name.cert -req -signkey rsa_private.key -days 100
 
 A certificate is only valid for a finite amount of time, with the default being
 30 days. You'll probably want it for longer than that, so use the `-days` option
@@ -72,8 +72,8 @@ organisation has a process for this already, this is a fairly painless task.
 Firstly you need a private key and CSR, generated the same way as for
 self-signed:
 
-    # openssl genrsa -out rsa_private.key 2048
-    # openssl req -new -key rsa_private.key > server_name.csr
+    [root]# openssl genrsa -out rsa_private.key 2048
+    [root]# openssl req -new -key rsa_private.key > server_name.csr
 
 Then instead of generating a certificate yourself, you send the CSR file to your
 organisation to be sent for signing.
@@ -89,7 +89,7 @@ Firstly having got the certificates and associated files onto the server (as
 root, and with sensible file permissions!), all that really needs done is to set
 up `mod_ssl`. If not already installed:
 
-    # yum install mod_ssl  # or apt-get, or whatever
+    [root]# yum install mod_ssl  # or apt-get, or whatever
 
 Then update your web app's Apache config:
 
