@@ -17,23 +17,27 @@ First, we had to consider the overall architecture of this new Reporting App. Ou
 <div>
     <figure class="fig">
         <svg height="250" width="100%" style="display:inline;">
-            <rect x="2%" y="4%" rx="10" ry="10" width="45%" height="95%">HTTP server</rect>
+            <rect x="2%" y="2%" width="45%" height="95%">HTTP server</rect>
             <rect x="5%" y="14%" rx="10" ry="10" width="22%" height="18%" />
-            <text x="7%" y="24%">Front end</text>
+            <text x="6%" y="24%">Front end</text>
             <rect x="5%" y="48%" rx="10" ry="10" width="22%" height="18%" />
-            <text x="7%" y="58%">Rest API</text>
-            <text x="7%" y="85%">HTTP server</text>
+            <text x="6%" y="58%">Rest API</text>
+            <text x="6%" y="85%">HTTP server</text>
 
-            <rect x="52%" y="30%" rx="10" ry="10" width="22%" height="18%" />
-            <text x="54%" y="40%">Pipeline</text>
-            <rect x="52%" y="60%" rx="10" ry="10" width="22%" height="18%" />
-            <text x="54%" y="70%">Database</text>
+            <rect x="62%" y="30%" rx="10" ry="10" width="22%" height="18%" />
+            <text x="63%" y="40%">Pipeline</text>
+            <rect x="62%" y="60%" rx="10" ry="10" width="22%" height="18%" />
+            <text x="63%" y="70%">Database</text>
 
-            <line x1="27%" x2="52%" y1="55%" y2="40%"/>
-            <line x1="27%" x2="52%" y1="60%" y2="70%"/>
+            <line x1="27%" x2="62%" y1="55%" y2="40%"/>
+            <line x1="27%" x2="62%" y1="60%" y2="70%"/>
             <line x1="16%" x2="16%" y1="32%" y2="48%"/>
 
         </svg>
+        <p>
+        Web app layout. The codebases for the Rest API and the front-end sit inside of an HTTP server,
+        with the Rest API communicating with a database as a back-end and our pipeline as a client.
+        </p>
     </figure>
 </div>
 

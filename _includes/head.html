@@ -8,6 +8,20 @@
 
   <!-- JQuery -->
   <script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script>
+    function format_svg() {
+        var rects = $('.fig > svg > rect');
+        for (var i=0; i<rects.length; i++) {
+            rects[i].setAttribute('rx', 3);
+            rects[i].setAttribute('ry', 3);
+        }
+
+        var texts = $('.fig > svg > text');
+        for (var i=0; i<texts.length; i++) {
+            texts[i].setAttribute('font-size', 12);
+        }
+    }
+  </script>
 
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">

@@ -8,7 +8,7 @@
 # Site settings
 title: Genomics in B<span class="music">♭</span>
 description: >  # ignore newlines until "baseurl:"
-  <i class="fa fa-flask"></i> Biology, <i class="fa fa-terminal"></i> programming, <i class="fa fa-music"></i> music.
+  <i class="fa fa-flask"></i> Biology<br/><i class="fa fa-terminal"></i> Programming<br/><i class="fa fa-music"></i> Music
 plain_description: Biology, progamming, music.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://mwhamgenomics.github.io" # the base hostname & protocol
