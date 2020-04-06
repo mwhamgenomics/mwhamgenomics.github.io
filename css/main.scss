@@ -149,3 +149,8 @@ a.post-meta {
     width: 50%;
 }
 
+.table, th, td {
+    border: 1px solid #ddd;  // from Bootstrap .table
+    text-align: left;
+}
+
