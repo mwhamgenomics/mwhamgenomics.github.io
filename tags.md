@@ -1,17 +1,16 @@
 ---
-layout: page
 title: Tags
-permalink: /tags
+url: /tags
 ---
 Here you can browse posts by tags. Each tag may have many posts, and each post may have many tags.
 
-{% for mapping in site.tags %}
-<h3 id="{{ mapping[0] }}">{{ mapping[0] }} <span class="badge">{{ mapping[1].size }}</span></h3>
+{% for tagname, posts in site.tags | dictsort %}
+<h2 id="{{ tagname }}">{{ tagname }} <span class="badge">{{ posts | length }}</span></h2>
 <ul class="link-list">
-  {% for post in mapping[1] %}
+  {% for post in posts %}
     <li>
-      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-      <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+      <span class="post-meta">{{ post.metadata.human_readable_date }}</span>
+      <a class="post-link" href="{{ post.url }}">{{ post.metadata.title }}</a>
     </li>
   {% endfor %}
 </ul>

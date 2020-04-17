@@ -1,7 +1,5 @@
 ---
-layout: page
 title: Linux 
-permalink: /linux
 ---
 
 As a Linux user, I have and probably always will have a lot to learn about the systems I use - definitely
@@ -11,7 +9,7 @@ updating this over time. Here are some compiled notes on some of the main things
 Last updated: 9th Mar 19
 
 ## Bash
-Bash is my current shell of choice. I'm not hardcore enough to use zsh yet.
+Bash is the shell that I use in Linux and in macOS up to Catalina, which sets the default shell to zsh.
 
 | Keystroke              | Action                                                                             |
 |------------------------|------------------------------------------------------------------------------------|
@@ -19,12 +17,10 @@ Bash is my current shell of choice. I'm not hardcore enough to use zsh yet.
 | `ctrl-r`               | enter incremental history search. `ctrl` + `r`/`s` searches backwards and forwards |
 | `alt` + `right`/`left` | jump the cursor over words                                                         |
 | `ctrl` + `a`/`e`       | jump to the start or end of the line                                               |
-{:.table}
 
 In macOS, `ctrl-s` might not work. This seems to have been turned off as a safety measure against hitting `ctrl-s`
 outside of the search (which enters XOFF mode, cutting off stdin from the terminal - the remedy being `ctrl-q`).
 To allow `ctrl-s` to work, run `stty -ixon -ixoff`.
-
 
 ## Vi
 The more you put into Vi/Vim, the more you get out. If you just use its basic features with no customisation,
@@ -40,7 +36,6 @@ started:
 |-------------------------|---------------------------------------------------------------------|
 | `:new/:vnew`            | split the window horizontally or vertically with a new empty buffer |
 | `:split/:vsplit [file]` | same, except with the current buffer or `[file]`                    |
-{:.table}
 
 Once multiple windows are open:
 
@@ -53,7 +48,6 @@ Once multiple windows are open:
 | `[vertical] resize n` | change the current window size to `n`                |
 | `:only`               | close all other windows                              |
 | `:ls`                 | list all buffers                                     |
-{:.table}
 
 ### Tabs
 A tab is a collection of windows.
@@ -89,7 +83,6 @@ it's found a match:
 | `N`       | search backwards      |
 | `ggn`     | go to the first match |
 | `GN`      | go to the last match  |
-{:.table}
 
 You can also append the search term with `\c` to make the search case insensitive, or `\C` for case sensitive.
 There are also a couple of search shortcuts:
@@ -98,7 +91,6 @@ There are also a couple of search shortcuts:
 |-----------|------------------------------------------------------------------------|
 | `*`/`#`   | search forwards/backwards for occurrences of the word the cursor is on |
 | `g*`/`g#` | same, except search for any occurrence, not just the exact word        |
-{:.table}
 
 autoindent
 
@@ -127,7 +119,6 @@ global across all files.
 | `'<char>` or `` `<char>`` | jump to a mark                                        |
 | `:marks`                  | list all marks                                        |
 | `:delmarks <chars>`       | delete marks - can also multi-delete with, e.g, 'a-d' |
-{:.table}
 
 ### Other random stuff
 
@@ -137,7 +128,6 @@ global across all files.
 | `J`                  | join lines - like deleting the `\n` at the end of the line, except the cursor can be anywhere |
 | `set <settingname>?` | show the value of a setting                                                                   |
 | `set <settingname>&` | reset a setting to its default                                                                |
-{:.table}
 
 ### netrw
 Netrw is the default file system explorer for Vi.
@@ -147,7 +137,6 @@ Netrw is the default file system explorer for Vi.
 | `:Explore`         | open netrw in the current window |
 | `:Sexplore` (heh.) | split and open netrw             |
 | `:Vexplore`        | vertically split and open netrw  |
-{:.table}
 
 In netrw:
 
@@ -188,7 +177,6 @@ Once a tmux session is open:
 | `ctrl-b ctrl-o`         | rotate all panes around the window |
 | `ctrl-b ctrl-<arrow>`   | resize the pane in increments of 1 |
 | `ctrl-b alt-<arrow>`    | resize the pane in increments of 5 |
-{:.table}
 
 One thing I currently dislike about tmux is the number of keystroke-based commands, which I often find
 unintuitive. For certain features, I prefer string commands input via `ctrl-b :`:
@@ -207,7 +195,6 @@ unintuitive. For certain features, I prefer string commands input via `ctrl-b :`
 | `paste-buffer`                           | enter the most recent buffer (or any buffer name with `-b` into the current pane |
 | `save-buffer <file>`                     | write the most recent buffer (or any buffer name with `-b` to `<file>`           |
 
-  
 
 When I tried using Vi in tmux, I found that tmux was eating my colour scheme. This was fixed by adding
 `set -g default-terminal "screen-256color"` to my `tmux.conf`. I also ran into some problems with resizing windows
@@ -224,5 +211,3 @@ There's also a solarized-style tmux colour scheme available at https://github.co
 
 
 TODO: screen, less, https://shapeshed.com/vim-netrw
-
-
