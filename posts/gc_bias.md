@@ -58,11 +58,11 @@ even in areas of moderately high GC for some library preps. For an example, see 
 <div class="container" style="margin: 0; width: 100%;">
     <div class="row">
         <div class="col-sm-6">
-            <img class="jpeg" src="/images/non_biased_coverage.jpg" alt="non_biased_coverage" />
+            <img class="jpeg" src="/img/non_biased_coverage.jpg" alt="non_biased_coverage" />
             <small>Non GC-biased</small>
         </div>
         <div class="col-sm-6">
-            <img class="jpeg" src="/images/biased_coverage.jpg" alt="biased_coverage" />
+            <img class="jpeg" src="/img/biased_coverage.jpg" alt="biased_coverage" />
             <small>GC-biased</small>
         </div>
     </div>
@@ -87,7 +87,7 @@ through the data points and measuring its gradient. To do this, we used
 [SciPy](https://scipy.org/). This algorithm essentially draws a line of best fit (shown below in red) through the
 input data points and returns a slope/gradient value:
 
-<img class="jpeg jpeg_small" src="/images/theil_sen.jpg" alt="theil_sen" />
+<img class="jpeg jpeg_small" src="/img/theil_sen.jpg" alt="theil_sen" />
 <br/>
 <small>Theil-Sen estimation</small>
 
@@ -103,7 +103,7 @@ estimation to see if it was also an effective measurement. For each data point, 
 absolute of the coverage value, which is effectively the equivalent of taking a ruler and measuring the distance
 on the graph between the data point and the normal - again shown below in red:
 
-<img class="jpeg jpeg_small" src="/images/normal_deviation.jpg" alt="normal_deviation" />
+<img class="jpeg jpeg_small" src="/img/normal_deviation.jpg" alt="normal_deviation" />
 <br/>
 <small>Normal deviation</small>
 
@@ -148,7 +148,7 @@ def deviation_from_normal(lines):
 
 Running the above algorithms on our 40 samples gave the following violin plots:
 
-<img class="jpeg" src="/images/comparison.jpg" alt="comparison" />
+<img class="jpeg" src="/img/comparison.jpg" alt="comparison" />
 <br/>
 <small>Violin plots of both metrics discussed above, for known biased/unbiased samples</small>
 
@@ -171,4 +171,3 @@ Having found a way of reporting on GC bias in samples, the next step is to find 
 a library preparation plate, which our system is not currently optimised for. Once we have made this possible
 though, we will be able to detect biased library preparation in a sequencing batch, allowing us to repeat the
 preparation and sequencing in order to produce better data.
-
