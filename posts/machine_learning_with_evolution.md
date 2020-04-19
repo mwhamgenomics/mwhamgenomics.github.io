@@ -8,6 +8,7 @@ external_links:
     - title: Pip documentation
       link: 'https://pip.pypa.io'
       description: Guides on pip's many capabilities in installing, uninstalling, updating and listing Python modules.
+publish: false
 ---
 
 About a year and a half ago I was at a workshop where a colleague (of sorts) was presenting some work he'd done on a

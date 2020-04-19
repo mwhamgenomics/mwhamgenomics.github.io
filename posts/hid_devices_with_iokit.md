@@ -8,6 +8,7 @@ external_links:
     - title: WWDC 2011 presentation on userland device access
       link: 'https://developer.apple.com/videos/play/wwdc2011/207'
       description: "Guides on pip's many capabilities in installing, uninstalling, updating and listing Python modules."
+publish: false
 ---
 
 I've pent a bit of time playing around with machine learning and video games, which involved setting up an
