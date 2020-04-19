@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Programming HID devices in macOS with IOKit - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Programming HID devices in macOS with IOKit</h2>
+
+<p>2 Sep 2017</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#swift">swift</a>
+  
+</span></p>
+
+
+<p>I've pent a bit of time playing around with machine learning and video games, which involved setting up an
+emulator for playing Super Nintendo games, which I would then try get neural networks to 'play'. At
+this point, I hit not really a technical hitch, but a pause for thought: did I really want to develop a
+neural network that's better at games than me? Clearly to allow this work to proceed, I had to brush up
+on my classic gaming.</p>
+<p>It's perfectly possible to play games on an emulator using the keys on the keyboard. The problem with that
+is that using a keyboard is completely different from using a SNES controller, for example. I quickly
+discovered this first-hand and found even easy games difficult to play on the keyboard.</p>
+<p>I had a quick look around at controllers for personal computers, and found none in any shops near me.
+I then recalled an old USB game controller lying in a drawer at home. It resembled an old PlayStation 1
+controller, and was much closer to what I needed. The only problem was that, being about 16 years old, it
+had been discontinued and the driver was no longer available. Here, I saw an opportunity for a challenge:
+would it be possible to write my own driver?</p>
+<h2>HID devices</h2>
+<p>As a USB device, the controller was already accessible through <a href="">a standard API</a>, which meant that at
+least I wouldn't need to dabble in raw assembly code. On top of USB, there are libraries like
+<a href="">libusb</a> for interacting with these devices, as well as bindings for other languages. I first tried a
+Python binding for libusb called <a href="">pyusb</a> and was able to get some metadata about the device but no
+actual inputs. This turned out to be a result of an incompatibility between macOS and libusb, the whole
+debacle of which is documented <a href="http://www.libusb.org/ticket/89">here</a>.</p>
+<p>Plan B was to use macOS's built-in functionality for HID devices. A HID (Human Interface Device) is a
+physical device that you can use to interact with a computer - things like keyboards, mice, game
+controllers and LCD displays. For this, I would have to delve into native macOS development. I had
+heard enough about Objective C to be wary of learning it from scratch, however Apple's successor
+language, Swift, looked interesting. The syntax is much cleaner than C variants - much like Python with
+a little extra core functionality for things like type checking. It also claimed to be suitable for
+high-performance applications like games and other programs that run in real time. It was time to try it out!</p>
+<h2>Swift and IOKit</h2>
+<p>After some preliminary searching, I found a <a href="">presentation</a> given at an Apple WWDC on interacting with HID
+devices using macOS's IOKit library. This gave a good overview of the relevant macOS infrastructure,
+and even went through an example of writing a driver for a gaming keyboard. The only problem was that all
+of the example code was in Objective C, but even that wasn't too big a deal, as Swift is able to use
+existing Objective C libraries. I also found an existing example of using IOKit with Swift, which the author
+says was tricky to get working.</p>
+<h2>Discovering the device</h2>
+<p>First, we need some information about the device. I was able to get this in Python with
+<a href="https://github.com/apmorton/pyhidapi">pyhidapi</a> combined with a custom compiled version of the <code>hidapi</code> C
+library, which worked but was probably more complicated than it needed to be. Regardless of what USB library
+you use, you should get some summary information about your HID device:</p>
+<pre><code>{
+    &quot;product_string&quot;: &quot;Some kind of controller&quot;,
+    &quot;vendor_id&quot;: 1234,
+    &quot;manufacturer_string&quot;: &quot;Some company that made this thing&quot;,
+    &quot;product_id&quot;: 56789,
+    # ...
+}
+</code></pre>
+
+<p>The bits we need are the vendor ID and product ID - we need these so we can tell the system to connect
+to, say, a Logitech G13 or an Apple wired mouse. In Swift, we can now use the <code>IOKit.hid</code> library to
+connect to it:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nv">manager</span> <span class="p">=</span> <span class="n">IOHIDManagerCreate</span><span class="p">(</span><span class="n">kCFAllocatorDefault</span><span class="p">,</span> <span class="n">IOOptionBits</span><span class="p">(</span><span class="n">kIOHIDOptionsTypeNone</span><span class="p">))</span><br /><span class="kd">let</span> <span class="nv">device_match</span> <span class="p">=</span> <span class="p">[</span><span class="n">kIOHIDProductIDKey</span><span class="p">:</span> <span class="mi">56789</span><span class="p">,</span> <span class="n">kIOHIDVendorIDKey</span><span class="p">:</span> <span class="mi">1234</span><span class="p">]</span><br />&nbsp;<br /><span class="n">IOHIDManagerSetDeviceMatching</span><span class="p">(</span><span class="n">manager</span><span class="p">,</span> <span class="n">device_match</span> <span class="k">as</span> <span class="n">CFDictionary</span><span class="p">?)</span><br /><span class="n">IOHIDManagerScheduleWithRunLoop</span><span class="p">(</span><span class="n">manager</span><span class="p">,</span> <span class="n">CFRunLoopGetCurrent</span><span class="p">(),</span> <span class="n">CFRunLoopMode</span><span class="p">.</span><span class="n">defaultMode</span><span class="p">.</span><span class="n">rawValue</span><span class="p">);</span><br /><span class="n">IOHIDManagerOpen</span><span class="p">(</span><span class="n">manager</span><span class="p">,</span> <span class="n">IOOptionBits</span><span class="p">(</span><span class="n">kIOHIDOptionsTypeNone</span><span class="p">));</span><br /></pre></div><br /></div>
+
+<p>First, we create an <code>IOHIDManager</code>, which will manage the devices we connect to. <code>kCFAllocatorDefault</code> is a
+memory management object, and the second argument is an unused option, so we just need to pass in a null value
+of type <code>IOOptionBits</code>. We then create a Swift Dictionary containing the vendor and product
+IDs, which we then cast to a <code>CFDictionary</code> and pass along with the IOHIDManager object into a
+function called <code>IOHIDManagerSetDeviceMatching</code>, which will tell the IOHIDManager to look for the
+controller. We also need to schedule the manager with a run loop so it can listen for data from the
+device. Finally, we call <code>IOHIDManagerOpen</code> to activate it.</p>
+<h2>Setting up an IOHIDDevice</h2>
+<p>Now we need to register some callbacks - functions that get run when a given thing happens.</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kd">func</span> <span class="nf">matching_callback</span><span class="p">(</span><span class="n">inContext</span><span class="p">,</span> <span class="n">inResult</span><span class="p">,</span> <span class="n">inSender</span><span class="p">,</span> <span class="n">inIOHIDDeviceRef</span><span class="p">)</span> <span class="p">{</span><br />    <span class="c1">// do some things</span><br /><span class="p">}</span><br /><span class="kd">func</span> <span class="nf">removal_callback</span><span class="p">(</span><span class="n">inContext</span><span class="p">,</span> <span class="n">inResult</span><span class="p">,</span> <span class="n">inSender</span><span class="p">,</span> <span class="n">inIOHIDDeviceRef</span><span class="p">)</span> <span class="p">{</span><br />    <span class="c1">// do some things</span><br /><span class="p">}</span><br />&nbsp;<br /><span class="n">IOHIDManagerRegisterDeviceMatchingCallback</span><span class="p">(</span><br />    <span class="n">manager</span><span class="p">,</span><br />    <span class="n">matching_callback</span><span class="p">,</span><br />    <span class="bp">unsafeBitCast</span><span class="p">(</span><span class="kc">self</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">UnsafeMutableRawPointer</span><span class="p">.</span><span class="kc">self</span><span class="p">)</span><br /><span class="p">)</span><br /><span class="n">IOHIDManagerRegisterDeviceRemovalCallback</span><span class="p">(</span><br />    <span class="n">manager</span><span class="p">,</span><br />    <span class="n">removal_callback</span><span class="p">,</span><br />    <span class="bp">unsafeBitCast</span><span class="p">(</span><span class="kc">self</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">UnsafeMutableRawPointer</span><span class="p">.</span><span class="kc">self</span><span class="p">)</span><br /><span class="p">)</span><br /></pre></div><br /></div>
+
+<p>These are functions to be run whenever a matching device is connected and removed.</p>
+<h2>Dissecting the data</h2>
+<p>At the moment we have 'match' and 'remove' callbacks, but nothing for when buttons are pressed on the controller.
+We can hardly hook up a device to listen for input before it's connected, so we need to do that inside the
+'match' callback:</p>
+<p>let inputCallback : IOHIDReportCallback = { inContext, inResult, inSender, type, reportId, report, reportLength in
+    let this: BusyLight = unsafeBitCast(inContext, to: BusyLight.self)
+    this.input(inResult, inSender: inSender!, type: type, reportId: reportId, report: report, reportLength: reportLength)
+}</p>
+<p>// Hook up inputcallback
+IOHIDDeviceRegisterInputReportCallback(device!, report, reportSize, inputCallback, unsafeBitCast(self, to: UnsafeMutableRawPointer.self));</p>
+<h2>Firing events</h2>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        WWDC 2011 presentation on userland device access: <a href="https://developer.apple.com/videos/play/wwdc2011/207">https://developer.apple.com/videos/play/wwdc2011/207</a>
+        <p class="small_font">Guides on pip's many capabilities in installing, uninstalling, updating and listing Python modules.</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2017/06/13/slurm_child_processes.html">Slurm and disappearing jobs: parallel processes in non-terminal environments</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2018/01/22/web_app_5_https.html">Building a web app part 5 - Running Apache on HTTPS</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Building a web app part 2 - Flask front end - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Building a web app part 2 - Flask front end</h2>
+
+<p>15 Jul 2016</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#python">python</a>, 
+  
+    <a href="/tags#web development">web development</a>, 
+  
+    <a href="/tags#reporting app">reporting app</a>
+  
+</span></p>
+
+
+<p>The main focus of the stack in Edinburgh Genomics' reporting app is the Rest API/database back end (both in terms of
+both rate of development and lines of code) rather than the front end. This post, then, could turn out to be quite a
+short one. There's little point in rehashing Flask's documentation, so instead I will briefly describe how we set up a
+simple web app with template rendering .</p>
+<p>The basics of the app's setup is almost exactly the same as the introductory section of Flask's documentation:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">flask</span><br /><span class="n">app</span> <span class="o">=</span> <span class="n">flask</span><span class="o">.</span><span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><br />&nbsp;<br /><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><br /><span class="k">def</span> <span class="nf">main_page</span><span class="p">():</span><br />    <span class="k">return</span> <span class="s1">&#39;This is a main page&#39;</span><br /></pre></div><br /></div>
+
+<p>Visit the top level of this app in a web browser and you will see the text 'This is a main page'. Of course, this is not
+very useful. We could have the function return html content, but it would be a hugely horrible function if we tried to
+render a full html-formatted web page. If we want to do that, it's best to use templates.</p>
+<h2>HTML templates</h2>
+<p>Flask's template rendering is done via Jinja2, and allows you to render dynamic html pages:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><br /><span class="k">def</span> <span class="nf">main_page</span><span class="p">():</span><br />    <span class="k">return</span> <span class="n">flask</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;main_page.html&#39;</span><span class="p">)</span><br /></pre></div><br /></div>
+
+<div class="code"><div class="highlight"><pre><span></span><span class="c">&lt;!-- templates/main_page.html: --&gt;</span><br /><span class="cp">&lt;!DOCTYPE html&gt;</span><br /><span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Main page<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span><br />    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span><br />&nbsp;<br />    <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>This is a main page<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span><br />    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span><br /><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span><br /></pre></div><br /></div>
+
+<p>Of course we don't want to have to write all of this boilerplate for every page we want. Ideally we would structure it
+like classes - a base template, with sub-templates that inherit from it. Let's add another page, and add some Jinja2
+syntax to the templates.</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="x">&lt;!-- templates/base.html: --&gt;</span><br /><span class="x">&lt;!DOCTYPE html&gt;</span><br /><span class="x">&lt;html lang=&quot;en&quot;&gt;</span><br /><span class="x">    &lt;head&gt;</span><br /><span class="x">        </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">head</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">        &lt;!-- some css styling --&gt;</span><br /><span class="x">        &lt;title&gt;</span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"> - web page&lt;/title&gt;</span><br /><span class="x">        </span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">    &lt;/head&gt;</span><br />&nbsp;<br /><span class="x">    &lt;body&gt;</span><br /><span class="x">        </span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">        &lt;p&gt;This is a website&lt;/p&gt;</span><br /><span class="x">        </span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">    &lt;/body&gt;</span><br /><span class="x">&lt;/html&gt;</span><br /></pre></div><br /></div>
+
+<div class="code"><div class="highlight"><pre><span></span><span class="x">&lt;!-- templates/main_page.html: --&gt;</span><br /><span class="cp">{%</span> <span class="k">extends</span> <span class="s1">&#39;base.html&#39;</span> <span class="cp">%}</span><span class="x"></span><br /><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span><span class="x">Main page</span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /><span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">    </span><span class="cp">{{</span> <span class="nb">super</span><span class="o">()</span> <span class="cp">}}</span><span class="x"></span><br /><span class="x">    &lt;p&gt;This is a main page&lt;/p&gt;</span><br /><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /></pre></div><br /></div>
+
+<div class="code"><div class="highlight"><pre><span></span><span class="x">&lt;!-- templates/second_page.html: --&gt;</span><br /><span class="cp">{%</span> <span class="k">extends</span> <span class="s1">&#39;base.html&#39;</span> <span class="cp">%}</span><span class="x"></span><br /><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span><span class="x">Another page</span><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /><span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span><span class="x"></span><br /><span class="x">    &lt;p&gt;This is a main page&lt;/p&gt;</span><br /><span class="x">    </span><span class="cp">{{</span> <span class="nv">text</span> <span class="cp">}}</span><span class="x"></span><br /><span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="x"></span><br /></pre></div><br /></div>
+
+<p>Here, base.html contains a default <head>, allowing css styling to be included in all sub-templates. Each sub-template
+implements a <code>title</code> block, which will be inserted into the <code>&lt;title&gt;</code> element of the base template. <code>main_page</code> will
+have the base's <code>content</code> block plus some of its own stuff, and <code>second_page</code> completely overrides <code>content</code>. Text can
+be added into <code>second_page</code> by Flask with <code>flask.render_template('second_page.html', text='Some text to add')</code>.</p>
+<h2>User input</h2>
+<p>While visiting websites, you may have noticed that the URL of the page sometimes has a <code>?</code> followed by a series of <code>x=y</code>
+key-value pairs. This is the query string, and is accessible to Flask via <code>flask.request</code>:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/second_page&#39;</span><span class="p">)</span><br /><span class="k">def</span> <span class="nf">second_page</span><span class="p">():</span><br />    <span class="k">return</span> <span class="n">flask</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;second_page.html&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">flask</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;input_text&#39;</span><span class="p">))</span><br /></pre></div><br /></div>
+
+<p>If this endpoint is visited, e.g. via the url <code>localhost:5000/second_page?input_text=thisthatother</code>, the string
+<code>thisthatother</code> will be passed via flask.request.args to the template and rendered on the web page. Not too useful in
+this case, but very useful for instances where data needs to be passed from the client to the server.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Official Flask documentation.: <a href="http://flask.pocoo.org">http://flask.pocoo.org</a>
+        
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2016/07/15/web_app_1_nosql_and_eve.html">Building a web app part 1 - NoSQL and Eve</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2016/07/19/web_app_3_tornado.html">Building a web app part 3 - Production environment on Tornado</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

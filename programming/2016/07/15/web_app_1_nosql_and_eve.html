@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Building a web app part 1 - NoSQL and Eve - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Building a web app part 1 - NoSQL and Eve</h2>
+
+<p>15 Jul 2016</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#python">python</a>, 
+  
+    <a href="/tags#web development">web development</a>, 
+  
+    <a href="/tags#reporting app">reporting app</a>
+  
+</span></p>
+
+
+<p>Behind the scenes, the reporting app we developed at Edinburgh Genomics is powered by MongoDB and Eve. MongoDB, being a
+NoSQL database, stores JSON instead of tables, as in SQL databases. This makes it much more free-form than SQL, and
+allows for nesting of data structures, although the way we have been using it, there's not actually that much difference
+from SQL.</p>
+<p>We could have had the front end website query the database directly, however this would have made things complicated for
+other parts of our stack. Our pipelines and other scripts all push data to this database, so all of our programs would
+have to load a MongoDB client, set up a connection and push data, hopefully in the correct format. Because we had so
+many things using this database, and because we still wanted some kind of schema, we decided we wanted to interact with
+the database through a Rest API.</p>
+<p>Eve is a Flask-based Rest API library. This gave us an HTTP-based interface to the database and a very flexible schema
+for data flowing in. This allowed us to validate the data being stored while also being able to add new types of data
+over time without migrating the database.</p>
+<h2>Eve</h2>
+<p>Being an extension of Flask, Eve is fairly familiar to install and configure:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">eve</span><br />&nbsp;<br /><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><br />    <span class="s1">&#39;DOMAIN&#39;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="s1">&#39;an_endpoint&#39;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;an_endpoint&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;item_title&#39;</span><span class="p">:</span> <span class="s1">&#39;thing&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><br />                <span class="s1">&#39;a_field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;unique&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span><br />                <span class="s1">&#39;another_field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="mi">8</span> <span class="p">}</span><br />                <span class="s1">&#39;yet_another_field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span><br />            <span class="p">}</span><br />        <span class="p">},</span><br />        <span class="s1">&#39;MONGO_HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;mongodb://localhost&#39;</span><span class="p">,</span><br />        <span class="s1">&#39;MONGO_PORT&#39;</span><span class="p">:</span> <span class="mi">4888</span><span class="p">,</span><br />        <span class="s1">&#39;MONGO_DBNAME&#39;</span><span class="p">:</span> <span class="s1">&#39;reporting_app&#39;</span><span class="p">,</span><br />        <span class="s1">&#39;URL_PREFIX&#39;</span><span class="p">:</span> <span class="s1">&#39;api&#39;</span><span class="p">,</span><br />        <span class="s1">&#39;API_VERSION&#39;</span><span class="p">:</span> <span class="s1">&#39;0.1&#39;</span><span class="p">,</span><br />        <span class="s1">&#39;XML&#39;</span><span class="p">:</span> <span class="kc">False</span><br />    <span class="p">}</span><br /><span class="p">}</span><br />&nbsp;<br /><span class="n">app</span> <span class="o">=</span> <span class="n">eve</span><span class="o">.</span><span class="n">Eve</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span><br />&nbsp;<br /><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span><br />    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">4889</span><span class="p">)</span><br /></pre></div><br /></div>
+
+<p>Here, eve is configured through a dict, mainly through the <code>DOMAIN</code> field. We tell the app how to connect to a running
+instance of MongoDB, define a schema and run it locally on a given port. All we need now is a running database. With
+MongoDB, this is fairly easy. After downloading the executable binaries:</p>
+<pre><code>path/to/mongod --port 4888 --dbpath path/to/reporting_app_db
+</code></pre>
+<p>Should you wish more control over things like logging and the storage engine, the documentation for MongoDB has an
+<a href="https://docs.mongodb.com/manual/reference/configuration-options">extensive section</a> on configuring the server from a
+Yaml config file. However the database is configured, once it and the Eve app are running, you should now be able to go
+to 'http://localhost:4889/api/0.1' in a web browser and see a summary of all the endpoints in the database:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="p">{</span><br />    <span class="nt">&quot;_links&quot;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="nt">&quot;child&quot;</span><span class="p">:</span> <span class="p">[</span><br />            <span class="p">{</span><span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><span class="p">,</span> <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><span class="p">}</span><br />        <span class="p">]</span><br />    <span class="p">}</span><br /><span class="p">}</span><br /></pre></div><br /></div>
+
+<p>And upon visiting 'http://localhost:4889/api/0.1/an_endpoint', you should see some content:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="p">{</span><br />    <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="p">[],</span><br />    <span class="nt">&quot;_links&quot;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="nt">&quot;self&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><span class="p">,</span><br />            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><br />        <span class="p">},</span><br />        <span class="nt">&quot;parent&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;home&quot;</span><br />        <span class="p">}</span><br />    <span class="p">},</span><br />    <span class="nt">&quot;_meta&quot;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="nt">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><br />        <span class="nt">&quot;max_results&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span><br />        <span class="nt">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><br />    <span class="p">}</span><br /><span class="p">}</span><br /></pre></div><br /></div>
+
+<p>Of course there's nothing in the database yet, so there won't actually be anything in the <code>data</code> field. Let's rectify
+that.</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">requests</span><br /><span class="o">&gt;&gt;&gt;</span> <span class="n">new_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a_field&#39;</span><span class="p">:</span> <span class="s1">&#39;some text&#39;</span><span class="p">,</span> <span class="s1">&#39;another_field&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;yet_another_field&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;this&#39;</span><span class="p">,</span> <span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">]}</span><br /><span class="o">&gt;&gt;&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;localhost:4889/api/0.1/an_endpoint&#39;</span><span class="p">,</span> <span class="n">new_data</span><span class="p">)</span><br /><span class="p">{</span><span class="s1">&#39;_status&#39;</span><span class="p">:</span> <span class="s1">&#39;OK&#39;</span><span class="p">,</span> <span class="s1">&#39;_etag&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;random_string&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;random_string&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;_updated&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;a_date_time&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;_created&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;a_date_time&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;_links&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">:</span> <span class="s1">&#39;runs/&lt;_id&gt;&#39;</span><span class="p">}}}</span><br /></pre></div><br /></div>
+
+<p>The schema defined above controls what can enter the database. <code>a_field</code> has to be a string, <code>another_field</code> has to be
+an integer between 1 and 8, and <code>yet_another_field</code> has to be a list of strings. If you try and push some dodgy data,
+you should see an error message:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;localhost:4889/api/0.1/an_endpoint&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;some&#39;</span><span class="p">:</span> <span class="s1">&#39;dodgy data&#39;</span><span class="p">})</span><br /><span class="p">{</span><span class="s1">&#39;_status&#39;</span><span class="p">:</span> <span class="s1">&#39;ERR&#39;</span><span class="p">,</span> <span class="s1">&#39;_error&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Insertion failure: 1 document(s) contain(s) error(s)&#39;</span><span class="p">,</span> <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="mi">422</span><span class="p">},</span> <span class="s1">&#39;_issues&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;some&#39;</span><span class="p">:</span> <span class="s1">&#39;unknown field&#39;</span><span class="p">,</span> <span class="s1">&#39;a_field&#39;</span><span class="p">:</span> <span class="s1">&#39;required field&#39;</span><span class="p">}}</span><br /></pre></div><br /></div>
+
+<p>Having pushed some data, we should be able to visit the endpoint and see something like:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="p">{</span><br />    <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><br />        <span class="p">{</span><span class="nt">&quot;a_field&quot;</span><span class="p">:</span> <span class="s2">&quot;some text&quot;</span><span class="p">,</span> <span class="nt">&quot;another_field&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nt">&quot;yet_another_field&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;this&quot;</span><span class="p">,</span> <span class="s2">&quot;that&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">]},</span><br />    <span class="p">],</span><br />    <span class="nt">&quot;_links&quot;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="nt">&quot;self&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><span class="p">,</span><br />            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint&quot;</span><br />        <span class="p">},</span><br />        <span class="nt">&quot;next&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint?max_results=25&amp;page=2&quot;</span><span class="p">,</span><br />            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;next page&quot;</span><br />        <span class="p">},</span><br />        <span class="nt">&quot;parent&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;home&quot;</span><br />        <span class="p">},</span><br />        <span class="nt">&quot;last&quot;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="nt">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;an_endpoint?max_results=25&amp;page=3&quot;</span><span class="p">,</span><br />            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;last page&quot;</span><br />        <span class="p">}</span><br />    <span class="p">},</span><br />    <span class="nt">&quot;_meta&quot;</span><span class="p">:</span> <span class="p">{</span><br />        <span class="nt">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><br />        <span class="nt">&quot;max_results&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span><br />        <span class="nt">&quot;total&quot;</span><span class="p">:</span> <span class="mi">75</span><br />    <span class="p">}</span><br /><span class="p">}</span><br /></pre></div><br /></div>
+
+<p>Now things make a little more sense. The information you have pushed to the database is now stored in <code>data</code> as a list
+of dicts. Eve adds some metadata to the content, such as how much data is in the endpoint, as well as some information
+on pagination. If there's too much data for one page, you can visit the next page by visiting
+<code>http://localhost:4889/api/0.1/an_endpoint?max_results=25&amp;page=2</code>. Eve's <a href="http://python-eve.org">documentation</a> contains
+complete information on Eve's capabilities.</p>
+<h2>Simple aggregation</h2>
+<p>Eve is certainly not lacking for features. It's possible to filter, sort, limit which JSON fields are returned, control
+pagination, and embed data from other endpoints, all of which is useful to the web app front end. However, the one thing
+that Eve doesn't really do (as of version 0.6) is aggregation.</p>
+<p>At first, we were able to use Eve's event hook system. For a given endpoint, it is possible to register a function to
+the app to modify the data being returned on the fly. In our case, we could register a function that would add
+calculated fields to each JSON element being returned:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">eve</span><span class="o">.</span><span class="n">Eve</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span><br />&nbsp;<br /><span class="k">def</span> <span class="nf">add_calculated_field</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span><br />    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">:</span><br />        <span class="c1"># modify each element of response.data</span><br />        <span class="n">element</span><span class="p">[</span><span class="s1">&#39;an_aggregated_field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="s1">&#39;yet_another_field&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">element</span><span class="p">[</span><span class="s1">&#39;another_field&#39;</span><span class="p">]</span><br />&nbsp;<br /><span class="n">app</span><span class="o">.</span><span class="n">on_post_GET_an_endpoint</span> <span class="o">+=</span> <span class="n">add_calculated_field</span>  <span class="c1"># register the function</span><br /></pre></div><br /></div>
+
+<p>This allows us to aggregate on the fly rather than store aggregated data, which was something that we didn't want to do.
+However, because these fields were being added after filtering, it was not possible to filter data based on calculated
+fields. To do that, we need to use MongoDB's own aggregation, which has an extensive range of logic/aggregation
+functions, allowing you to pass returned data through a pipeline.</p>
+<h2>Pipeline aggregation</h2>
+<p>It is possible to aggregate in PyMongo or the MongoDB shell with a <code>list[dict]</code> pipeline. Here's a relatively simple
+example:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymongo</span><br /><span class="n">cli</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">4888</span><span class="p">)</span><br /><span class="n">db</span> <span class="o">=</span> <span class="n">cli</span><span class="p">[</span><span class="s1">&#39;reporting_app_db&#39;</span><span class="p">]</span><br /><span class="n">endpoint</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;an_endpoint&#39;</span><span class="p">]</span><br />&nbsp;<br /><span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span><br />    <span class="p">{</span><br />        <span class="s1">&#39;$project&#39;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="s1">&#39;a_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$a_field&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;another_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$another_field&#39;</span><br />            <span class="s1">&#39;yet_another_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$yet_another_field&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;a_calculated_field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$add&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;$another_field&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}</span><br />        <span class="p">}</span><br />    <span class="p">}</span><br /><span class="p">]</span><br />&nbsp;<br /><span class="n">endpoint</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span><br /></pre></div><br /></div>
+
+<p>Of course, it's not as simple as that. This is outside of Eve's filtering and pagination functionality. In this case, we
+need to this functionality back in ourselves. To filter depending on <code>a_field</code>:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span><br />    <span class="p">{</span><br />        <span class="s1">&#39;$project&#39;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="s1">&#39;a_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$a_field&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;another_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$another_field&#39;</span><br />            <span class="s1">&#39;yet_another_field&#39;</span><span class="p">:</span> <span class="s1">&#39;$yet_another_field&#39;</span><span class="p">,</span><br />            <span class="s1">&#39;a_calculated_field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$add&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;$another_field&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}</span><br />        <span class="p">}</span><br />    <span class="p">},</span><br />    <span class="p">{</span><br />        <span class="s1">&#39;$match&#39;</span><span class="p">:</span> <span class="p">{</span><br />            <span class="s1">&#39;a_calculated_field&#39;</span><span class="p">:</span> <span class="mi">4</span><br />        <span class="p">}</span><br />    <span class="p">}</span><br /><span class="p">]</span><br />&nbsp;<br /><span class="n">endpoint</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span><br /></pre></div><br /></div>
+
+<p>This will allow us to filter statically on a calculated field. The challenge now is to pass it through Eve. You can
+register a Flask endpoint (since Eve is Flask) linked to this pipeline, and if the pipeline listens to <code>flask.request</code>,
+you could visit, e.g, <code>http://localhost:4889/api/0.1/pipeline_aggregation?a_calculated_field=4</code>. The final challenge, in
+this case, is making the pipeline fully dynamic. If you are filtering on something that's already in the schema, you may
+as well do the <code>$match</code> at the start of the pipeline to minimise the calculations required, and if you're filtering on a
+calculated field, you'll want to calculate it first and have the <code>$match</code> after. Current versions of the Reporting App
+use mostly-dynamic aggregation pipelines, but this remains an interesting problem to solve and something that we're
+still working on.</p>
+<p>Apart from aggregation, for which we've rolled our own solution, Eve has allowed us, with relatively little effort, to
+set up a database and Rest API back-end for our Reporting App. Being Flask, we were able to run it in an identical way
+to our front end. Eve is fairly easy to configure, full-featured, and has a very flexible and lenient schema system,
+allowing us to work with a rapidly-developing app and database, even in production.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        MongoDB documentation: <a href="https://docs.mongodb.com">https://docs.mongodb.com</a>
+        <p class="small_font">Official MongoDB website.</p>
+      </li>
+    
+      <li>
+        Eve documentation: <a href="http://python-eve.org">http://python-eve.org</a>
+        <p class="small_font">Documentation for the many features of Eve.</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2016/07/15/web_app_0_overview.html">Building a web app - Introduction</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2016/07/15/web_app_2_flask.html">Building a web app part 2 - Flask front end</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

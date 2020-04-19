@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Debugging C programs with Valgrind - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Debugging C programs with Valgrind</h2>
+
+<p>22 May 2017</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#environment">environment</a>, 
+  
+    <a href="/tags#c">c</a>
+  
+</span></p>
+
+
+<p>Recently after adding a new feature to
+<a href="https://github.com/EdinburghGenomics/Fastq-Filterer">the fastq filterer used at Edinburgh Genomics</a>, we got unexpected
+segfaults when running the program on full-size input data. The problem did not occur on smaller test data, making us
+think we were mishandling memory somewhere - very possible, since I'm still fairly new to programming in C. To find out
+what was going wrong, I used a piece of software called Valgrind.</p>
+<p>While advanced usage and interpretation of its optional outputs can get complicated, basic usage of Valgrind is very
+simple. You simply attach it to your program by prepending it to the command line you would normally use:</p>
+<pre><code>[mwhamgenomics]$ valgrind &lt;valgrind_args&gt; ./program &lt;program_args&gt;
+</code></pre>
+<p>By default, Valgrind will run a tool called <a href="http://valgrind.org/docs/manual/mc-manual.html">Memcheck</a>, which will look
+for any dodgy memory management in your program as it runs and produce a report at the end. With the right arguments,
+you can report on memory leaks, how many bytes of memory are affected, where they occur in the call stack, etc. This not
+only helped me correct an <code>malloc</code> call (embarrassingly, I'd neglected to add 1 to account for a <code>\0</code> null terminator),
+but also helped me learn about good practice for managing memory in C (allocate memory, then use it, then free it - no
+implicit calls to <code>malloc</code> and <code>free</code> buried inside functions) and taught me some of the nuances of <code>strtok</code>, which I
+was using to walk along a string (in brief, it returns a pointer to a segment of the string you pass in, so you need to
+make sure you don't free the string until you're completely finished with it).</p>
+<p>Some of Valgrind's other features include call mapping, inspections for threading and the cache, and attaching to a
+<a href="https://www.gnu.org/software/gdb">GDB</a> session. For something that deals with such a complex system, it turned out to
+be easy to use, flexible, reasonably clear and informative, and full-featured.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Valgrind official site: <a href="http://valgrind.org">http://valgrind.org</a>
+        
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2017/05/03/machine_learning_with_evolution.html">MarI/O: machine learning with evolutionary biology</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2017/06/13/slurm_child_processes.html">Slurm and disappearing jobs: parallel processes in non-terminal environments</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

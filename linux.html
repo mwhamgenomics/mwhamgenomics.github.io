@@ -1,0 +1,491 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Linux - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800"><p>As a Linux user, I have and probably always will have a lot to learn about the systems I use - definitely
+something worth posting about, but it didn't seem right to put this in a normal post since I'll be
+updating this over time. Here are some compiled notes on some of the main things I use working with Linux.</p>
+<p>Last updated: 9th Mar 19</p>
+<h2>Bash</h2>
+<p>Bash is the shell that I use in Linux and in macOS up to Catalina, which sets the default shell to zsh.</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctrl-k</code></td>
+<td>truncate the line at the cursor</td>
+</tr>
+<tr>
+<td><code>ctrl-r</code></td>
+<td>enter incremental history search. <code>ctrl</code> + <code>r</code>/<code>s</code> searches backwards and forwards</td>
+</tr>
+<tr>
+<td><code>alt</code> + <code>right</code>/<code>left</code></td>
+<td>jump the cursor over words</td>
+</tr>
+<tr>
+<td><code>ctrl</code> + <code>a</code>/<code>e</code></td>
+<td>jump to the start or end of the line</td>
+</tr>
+</tbody>
+</table>
+<p>In macOS, <code>ctrl-s</code> might not work. This seems to have been turned off as a safety measure against hitting <code>ctrl-s</code>
+outside of the search (which enters XOFF mode, cutting off stdin from the terminal - the remedy being <code>ctrl-q</code>).
+To allow <code>ctrl-s</code> to work, run <code>stty -ixon -ixoff</code>.</p>
+<h2>Vi</h2>
+<p>The more you put into Vi/Vim, the more you get out. If you just use its basic features with no customisation,
+there's no reason to use it over nano or gedit, but its more advanced features make it a viable dev environment
+for headless Linux.</p>
+<h3>Windows</h3>
+<p>From <a href="">Vi's docs</a>, a window is a view on a buffer, which is a bit of text loaded into memory. You can split
+your view up into windows on startup with <code>-o</code> or <code>-O</code> to split horizontally or vertically, or after Vi has
+started:</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:new/:vnew</code></td>
+<td>split the window horizontally or vertically with a new empty buffer</td>
+</tr>
+<tr>
+<td><code>:split/:vsplit [file]</code></td>
+<td>same, except with the current buffer or <code>[file]</code></td>
+</tr>
+</tbody>
+</table>
+<p>Once multiple windows are open:</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctrl-w &lt;direction&gt;</code></td>
+<td>navigate the cursor between windows</td>
+</tr>
+<tr>
+<td><code>ctrl-w K/J/H/L</code></td>
+<td>move the current window to the top/bottom/left/right</td>
+</tr>
+<tr>
+<td><code>ctrl-w +/-</code></td>
+<td>in/decrement the current window height</td>
+</tr>
+<tr>
+<td><code>ctrl-w &lt;/&gt;</code></td>
+<td>in/decrement the current window width</td>
+</tr>
+<tr>
+<td><code>[vertical] resize n</code></td>
+<td>change the current window size to <code>n</code></td>
+</tr>
+<tr>
+<td><code>:only</code></td>
+<td>close all other windows</td>
+</tr>
+<tr>
+<td><code>:ls</code></td>
+<td>list all buffers</td>
+</tr>
+</tbody>
+</table>
+<h3>Tabs</h3>
+<p>A tab is a collection of windows.</p>
+<ul>
+<li><code>:tabnew</code> to open a new tab with an empty buffer</li>
+<li><code>:tabedit &lt;file&gt;</code> to edit a file in a new tab</li>
+<li><code>gt</code> and <code>gT</code> to move between tabs</li>
+<li><code>vi -p &lt;file1&gt; &lt;file2&gt; ...</code> to open multiple files, each in their own tab</li>
+</ul>
+<h3>Diff mode</h3>
+<p>I didn't know Vi could do this at first, but it's pretty cool.</p>
+<ul>
+<li><code>vi -d &lt;file1&gt; &lt;file2&gt; ...</code> to open the given files in diff mode, where differences between buffers are highlighted</li>
+<li><code>:diffsplit &lt;file&gt;</code> to open a new file, comparing with the current buffer</li>
+<li><code>:vertical diffsplit &lt;file&gt;</code> to do the above but with a vertical split</li>
+<li><code>:set scrollbind</code> locks the scrolling between diff-ed buffers</li>
+</ul>
+<h3>Multiline editing</h3>
+<p>Vi doesn't support multiple cursors, but does have features for multiline editing:</p>
+<ul>
+<li>Select the lines to edit with Visual Block (<code>ctrl-v</code>). From here, you can:<ul>
+<li>insert text with <code>I</code>, then entering some text (it looks like you're only editing one line), then <code>esc</code> to exit insert mode and edit all lines.</li>
+<li>append the end of the line with <code>A</code>, then proceeding as above for inserting text</li>
+<li>delete text the same way as in other modes</li>
+</ul>
+</li>
+</ul>
+<h3>Searching</h3>
+<p>You might already be familiar with Vi's search function (<code>/</code> or <code>?</code>), but here are some things you can do once
+it's found a match:</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n</code></td>
+<td>search forwards</td>
+</tr>
+<tr>
+<td><code>N</code></td>
+<td>search backwards</td>
+</tr>
+<tr>
+<td><code>ggn</code></td>
+<td>go to the first match</td>
+</tr>
+<tr>
+<td><code>GN</code></td>
+<td>go to the last match</td>
+</tr>
+</tbody>
+</table>
+<p>You can also append the search term with <code>\c</code> to make the search case insensitive, or <code>\C</code> for case sensitive.
+There are also a couple of search shortcuts:</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code>/<code>#</code></td>
+<td>search forwards/backwards for occurrences of the word the cursor is on</td>
+</tr>
+<tr>
+<td><code>g*</code>/<code>g#</code></td>
+<td>same, except search for any occurrence, not just the exact word</td>
+</tr>
+</tbody>
+</table>
+<p>autoindent</p>
+<h3>Solarized</h3>
+<p>Solarized is a Vi colour palette available at https://github.com/altercation/vim-colors-solarized, and it's
+much nicer than the default colours.</p>
+<h3>Sessions</h3>
+<ul>
+<li><code>mksession &lt;file&gt;</code> saves the current Vi session (windows, tabs, etc.) to a session file</li>
+<li><code>vi -S &lt;file&gt;</code> loads a session file</li>
+</ul>
+<h3>Copy/paste</h3>
+<p>The system-wide clipboard won't work properly if you've got line numbers on or have a window or tmux pane off to
+the right hand side. Vi's visual selection, however, does work.</p>
+<p>With some text selected (with visual, visual line, or visual block), <code>d</code> deletes the text and <code>y</code> ('yank')
+copies it. Then <code>p</code> or <code>P</code> pastes it after or before the cursor.</p>
+<h3>Marks</h3>
+<p>Marks are what Vi calls bookmarks. Each mark is identified by a single char - if it's a capital letter, it's
+global across all files.</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>m&lt;char&gt;</code></td>
+<td>create a mark</td>
+</tr>
+<tr>
+<td><code>'&lt;char&gt;</code> or <code>`&lt;char&gt;</code></td>
+<td>jump to a mark</td>
+</tr>
+<tr>
+<td><code>:marks</code></td>
+<td>list all marks</td>
+</tr>
+<tr>
+<td><code>:delmarks &lt;chars&gt;</code></td>
+<td>delete marks - can also multi-delete with, e.g, 'a-d'</td>
+</tr>
+</tbody>
+</table>
+<h3>Other random stuff</h3>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:changes</code></td>
+<td>view all of the file's current changes</td>
+</tr>
+<tr>
+<td><code>J</code></td>
+<td>join lines - like deleting the <code>\n</code> at the end of the line, except the cursor can be anywhere</td>
+</tr>
+<tr>
+<td><code>set &lt;settingname&gt;?</code></td>
+<td>show the value of a setting</td>
+</tr>
+<tr>
+<td><code>set &lt;settingname&gt;&amp;</code></td>
+<td>reset a setting to its default</td>
+</tr>
+</tbody>
+</table>
+<h3>netrw</h3>
+<p>Netrw is the default file system explorer for Vi.</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:Explore</code></td>
+<td>open netrw in the current window</td>
+</tr>
+<tr>
+<td><code>:Sexplore</code> (heh.)</td>
+<td>split and open netrw</td>
+</tr>
+<tr>
+<td><code>:Vexplore</code></td>
+<td>vertically split and open netrw</td>
+</tr>
+</tbody>
+</table>
+<p>In netrw:</p>
+<ul>
+<li><code>return</code> enters a directory or opens a file in the current window</li>
+<li>the way it opens files is controlled by the variable <code>g:netrw_browse_split</code></li>
+<li>1 opens in a new split</li>
+<li>2 opens in a vsplit</li>
+<li>3 opens in a new tab</li>
+<li>
+<p>4 opens in the previous window</p>
+</li>
+<li>
+<p><code>I</code> turns off the header</p>
+</li>
+<li><code>i</code> cycles through view types:</li>
+<li>0: one file per line</li>
+<li>1: <code>ls -l</code>-style view</li>
+<li>2: <code>ls</code>-style view</li>
+<li>3: tree view</li>
+<li>set <code>g:netrw_liststyle</code> in the vimrc to set a default view type</li>
+<li>set <code>g:netrw_winsize</code> to set a default (percentage) window size for netrw</li>
+</ul>
+<h2>tmux</h2>
+<p>Standing for Terminal MUltipleXer, tmux is kind of like GNU screen with some extra stuff, including window
+splitting and scripted sessions. A tmux session contains multiple windows, which in turn contains multiple
+panes - in this case a tmux window is like a Vi tab, and a tmux pane is a Vi window.</p>
+<p>Once a tmux session is open:</p>
+<table>
+<thead>
+<tr>
+<th>Keystroke</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctrl-b :</code></td>
+<td>enter the tmux command line</td>
+</tr>
+<tr>
+<td><code>ctrl-b</code> + <code>(</code> or <code>)</code></td>
+<td>switch between sessions</td>
+</tr>
+<tr>
+<td><code>ctrl-b d</code></td>
+<td>detach the client</td>
+</tr>
+<tr>
+<td><code>ctrl-b c</code></td>
+<td>create a new window</td>
+</tr>
+<tr>
+<td><code>ctrl-b &amp;</code></td>
+<td>close the current window</td>
+</tr>
+<tr>
+<td><code>ctrl-b</code> + <code>n</code> or <code>p</code></td>
+<td>go to previous/next window</td>
+</tr>
+<tr>
+<td><code>ctrl-b</code> + <code>'</code> or <code>0-9</code></td>
+<td>go to a window</td>
+</tr>
+<tr>
+<td><code>ctrl-b &lt;arrow&gt;</code></td>
+<td>navigate between panes</td>
+</tr>
+<tr>
+<td><code>ctrl-b ctrl-o</code></td>
+<td>rotate all panes around the window</td>
+</tr>
+<tr>
+<td><code>ctrl-b ctrl-&lt;arrow&gt;</code></td>
+<td>resize the pane in increments of 1</td>
+</tr>
+<tr>
+<td><code>ctrl-b alt-&lt;arrow&gt;</code></td>
+<td>resize the pane in increments of 5</td>
+</tr>
+</tbody>
+</table>
+<p>One thing I currently dislike about tmux is the number of keystroke-based commands, which I often find
+unintuitive. For certain features, I prefer string commands input via <code>ctrl-b :</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rename-session &lt;name&gt;</code></td>
+<td>rename the session</td>
+</tr>
+<tr>
+<td><code>split-window</code>/<code>splitw</code></td>
+<td>split the window into two panes - <code>-v</code> or <code>-h</code> for vertical/horizontal splits</td>
+</tr>
+<tr>
+<td><code>rotate-window</code></td>
+<td>rotate all panes around the window</td>
+</tr>
+<tr>
+<td><code>resize-pane (-UDLR) &lt;value&gt;</code></td>
+<td>resize the pane up/down/left/right by the given value</td>
+</tr>
+<tr>
+<td><code>resize-pane (-xy) &lt;value&gt;</code></td>
+<td>resize the pane to the given x/y value</td>
+</tr>
+<tr>
+<td><code>break-pane</code></td>
+<td>split off the current pane into a new window</td>
+</tr>
+<tr>
+<td><code>capture-pane -S &lt;fromline&gt; -E &lt;toline&gt;</code></td>
+<td>capture the contents of the pane into a buffer</td>
+</tr>
+<tr>
+<td><code>list-buffers</code></td>
+<td>list all paste buffers</td>
+</tr>
+<tr>
+<td><code>delete-buffer -b &lt;buffer&gt;</code></td>
+<td>delete a buffer</td>
+</tr>
+<tr>
+<td><code>paste-buffer</code></td>
+<td>enter the most recent buffer (or any buffer name with <code>-b</code> into the current pane</td>
+</tr>
+<tr>
+<td><code>save-buffer &lt;file&gt;</code></td>
+<td>write the most recent buffer (or any buffer name with <code>-b</code> to <code>&lt;file&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>When I tried using Vi in tmux, I found that tmux was eating my colour scheme. This was fixed by adding
+<code>set -g default-terminal "screen-256color"</code> to my <code>tmux.conf</code>. I also ran into some problems with resizing windows
+on macOS because <code>ctrl-&lt;arrow&gt;</code> is a system command to switch between spaces. I got around this by:</p>
+<ul>
+<li>unbinding the <code>ctrl-&lt;arrow&gt;</code> commands</li>
+<li>re-binding each <code>alt-&lt;arrow&gt;</code> command to what <code>ctrl-&lt;arrow&gt;</code> was, since they're pretty similar anyway</li>
+<li>modifying the <code>alt-&lt;arrow&gt;</code> keyboard actions in Terminal settings:</li>
+<li>an <code>alt-&lt;arrow&gt;</code> sends a sequence of <code>\033\033[</code> plus A, B, D and C for up, down, left and right respectively  </li>
+</ul>
+<p>(Or you can just use string commands.)</p>
+<p>There's also a solarized-style tmux colour scheme available at https://github.com/seebi/tmux-colors-solarized.</p>
+<p>TODO: screen, less, https://shapeshed.com/vim-netrw</p></div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

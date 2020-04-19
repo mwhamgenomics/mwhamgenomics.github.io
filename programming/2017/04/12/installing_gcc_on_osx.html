@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Compiling GCC on OSX - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Compiling GCC on OSX</h2>
+
+<p>12 Apr 2017</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#environment">environment</a>
+  
+</span></p>
+
+
+<p>Recently, during the course of trying to install a piece of software, I found myself trying to install an isolated
+instance of GCC version 4.7 on OSX, which turned out to be something of an adventure.</p>
+<h2>Dependencies</h2>
+<p>Firstly, after downloading the source code from <a href="https://gcc.gnu.org/mirrors.html">one of GCC's FTP mirrors</a>, I
+initially tried configuring and compiling it. I immediately found I needed three other C libraries: GMP, MPC and MPFR.</p>
+<p>GCC's documentation claimed that downloading the source code for these into subdirectories inside the GCC directory
+would cause them to be built along with GCC. This sounded wonderful, however when I tried it, I found that MPFR wasn't
+being picked up properly.
+<a href="http://stackoverflow.com/questions/9297933/cannot-configure-gcc-mpfr-not-found">A StackOverflow thread</a> mentioned a
+change in file structure in later versions of MPFR. GCC 4.7 is a fairly old version, and I had tried it with the latest
+versions of GMP, MPC and MPFR, since finding contemporary versions of them turned out to be complicated. The lesson
+learned from this is that documentation claiming to require dependency version, say, 0.1.2 'or later', should be taken
+with a pinch of salt.</p>
+<p>Eventually, I found that all of this tedious manual downloading isn't actually necessary, as GCC provides a script in
+<code>contrib/download_prerequisites</code> which will not only automatically download and link GMP, MPC and MPFR, but also the
+correct versions of them.</p>
+<h2>Segfaults</h2>
+<p>Having resolved dependencies properly, I then hit a problem with segfaults during the compilation process. At this
+point, we are in a strange fractal scenario, where we are trying to compile a version of GCC with another pre-existing
+version of GCC. After a bit of reading, I found that said pre-existing GCC on OSX... isn't actually GCC. It is, in fact,
+Clang pretending to be GCC! I was able to resolve the segfaults I'd been getting by setting an environment variable:</p>
+<pre><code>[mwhamgenomics]$ export MACOSX_DEPLOYMENT_TARGET=10.9
+</code></pre>
+<p>This informs OSX's developer tools of the minimum version of OSX required. The underlying function of this environment
+variable is still a bit of a mystery to me, but as far as I can tell, it allows libraries to be linked in the right way
+for this old version of GCC - you'll notice later on that even having built GCC, it won't run (even <code>--version</code>) without
+this flag set.</p>
+<h2>System headers</h2>
+<p>Now upon configuring and compiling, I found that the stopping point was locating the C standard library, which GCC
+expects to be in <code>/usr/include</code>, which does not exist in OSX. This can be solved by supplying a
+<code>with-native-system-header-dir</code> argument at configure time.</p>
+<p>At this point, GCC proceeded to compile. This took several hours, but at last, I had a genuine functioning version of
+GCC 4.7 on Mac OSX.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        GCC official site: <a href="https://gcc.gnu.org">https://gcc.gnu.org</a>
+        
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2016/11/28/bash_io.html">Bash IO: handling multiple output files</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2017/05/03/machine_learning_with_evolution.html">MarI/O: machine learning with evolutionary biology</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

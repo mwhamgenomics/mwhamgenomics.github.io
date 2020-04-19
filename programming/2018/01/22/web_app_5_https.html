@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Building a web app part 5 - Running Apache on HTTPS - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Building a web app part 5 - Running Apache on HTTPS</h2>
+
+<p>22 Jan 2018</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#web development">web development</a>, 
+  
+    <a href="/tags#reporting app">reporting app</a>
+  
+</span></p>
+
+
+<p>When I first set up Edinburgh Genomics'
+<a href="/programming/2016/07/15/web_app_0_overview.html">reporting web app</a>, it was on
+HTTP without SSL encryption. This was not too much of a concern to start with
+since our servers were on a closed network, but later as a result of a new
+feature being added, it became necessary to switch the app over to use a secure
+connection. This meant setting up SSL certificates in order to get the app's
+HTTP server to use HTTPS.</p>
+<h2>SSL certificates</h2>
+<p>An SSL certificate is a file that is cryptographically 'signed' by a trusted
+party (either an individual or a CA - certificate authority), to enable secure
+and authenticated communication between the the client (e.g. a web browser) and
+the server. The process of setting up HTTPS simply consists of obtaining SSL
+certificates and pointing the web server to them (in the case of Apache, via
+<code>mod_ssl</code>). This post will describe how I did this on Edinburgh Genomics'
+reporting app.</p>
+<h2>Self-signed certificates</h2>
+<p>For testing or personal applications it's perfectly possible to use a
+self-signed certificate (after all, the most trustworthy party that can sign
+your certificate is yourself). Firstly we need an RSA private key. You might
+already have one, e.g. in <code>~/.ssh</code>, but you can generate a dedicated one with:</p>
+<pre><code>[root]# openssl genrsa -out rsa_private.key 2048
+</code></pre>
+<p>Once we have a private key, we can then generate a CSR (certificate signing
+request):</p>
+<pre><code>[root]# openssl req -new -key rsa_private.key &gt; server_name.csr
+</code></pre>
+<p>This enters an interactive prompt, asking you for metadata to be attached to
+the certificate, including your organisation name and location. This information
+appears in the resulting CSR file and is used to generate and sign a
+certificate:</p>
+<pre><code>[root]# openssl x509 -in server_name.csr -out server_name.cert -req -signkey rsa_private.key -days 100
+</code></pre>
+<p>A certificate is only valid for a finite amount of time, with the default being
+30 days. You'll probably want it for longer than that, so use the <code>-days</code> option
+to specify how long you want the certificate to be valid for. Once you've got
+this certificate, you can point your web server to it as below.</p>
+<h2>CA-signed certificates</h2>
+<p>While self-signed certificates are fine for testing and personal applications,
+there is an assumption that you trust the person who signed it. Web clients do
+not inherently know who to trust, so if you visit a website with a self-signed
+certificate, the web browser will complain and programmatic interfaces might not
+work at all. This is because web clients only trust a finite list of known CAs -
+organisations that are trusted by the worldwide web community to issue signed
+certificates. It is possible to install your self-signed certificate into the
+client, but that's an extra stage of setup that won't look very professional to
+others visiting your website.</p>
+<p>The solution to this is to get a certificate signed by a CA. If your
+organisation has a process for this already, this is a fairly painless task.
+Firstly you need a private key and CSR, generated the same way as for
+self-signed:</p>
+<pre><code>[root]# openssl genrsa -out rsa_private.key 2048
+[root]# openssl req -new -key rsa_private.key &gt; server_name.csr
+</code></pre>
+<p>Then instead of generating a certificate yourself, you send the CSR file to your
+organisation to be sent for signing.</p>
+<p>Once this has happened, your organisation should hand back to you one or more
+certificate files. You should have an actual certificate for your server,
+potentially a copy of the CA's root certificate (this is public), and an
+intermediate certificate linking your server's certificate to the CA's root one.
+These can now be set up on your server.</p>
+<h2>Adding certificates to Apache</h2>
+<p>Firstly having got the certificates and associated files onto the server (as
+root, and with sensible file permissions!), all that really needs done is to set
+up <code>mod_ssl</code>. If not already installed:</p>
+<pre><code>[root]# yum install mod_ssl  # or apt-get, or whatever
+</code></pre>
+<p>Then update your web app's Apache config:</p>
+<pre><code>&lt;VirtualHost *:80&gt;  # change this to '*:443'
+    ServerName &lt;server_name&gt;
+
+    # add these 4 lines
+    SSLEngine on
+    SSLCertificateFile "path/to/ssl_certificate.crt"
+    SSLCertificateChainFile "path/to/intermediate_certificate.crt"
+    SSLCertificateKeyFile "path/to/ssl_key.key"
+
+    # rest of the config...
+&lt;/VirtualHost&gt;
+</code></pre>
+<p>Here, we reconfigure the VirtualHost from port 80 (the default for HTTP) to 443
+(the default for HTTPS), and add some fairly self-explanatory SSL parameters.
+That's pretty much all that's required, however it is possible to go one
+further.</p>
+<h2>HTTPS redirection</h2>
+<pre><code>&lt;VirtualHost *:80&gt;
+    ServerName &lt;server_name&gt;  # this can be the same as above
+    Redirect / https://&lt;server_url&gt;
+&lt;/VirtualHost&gt;
+</code></pre>
+<p>Here we've added another VirtualHost on port 80 which we used to be listening
+on, and used Redirect from <code>mod_alias</code>, which here simply redirects any
+<code>http://</code> requests to <code>https://</code> on the same server. This will ensure HTTPS is
+always used without requiring the user to use <code>https://</code> in their URLs. There
+is, however, one caveat in that this only works for GET requests.</p>
+<p>I discovered this the hard way when I noticed that POST operations via
+<a href="http://docs.python-requests.org">Python requests</a> were returning <code>200 OK</code> when
+they should have returned <code>201 Created</code>. Looking at the response to one of
+these, I saw that it had been returned as a GET! It turned out that this is part
+of the rfc2616 HTTP specification, which states that any request other than GET
+or HEAD that receives a <code>301 Redirect</code> (which is how <code>mod_alias</code> redirection
+works) may not proceed to the new URL. Python requests was then converting this
+into a plain GET request (no query parameters) on the same endpoint. Of course
+you don't want this kind of behaviour in production, in which case it's
+important to use <code>https://</code> in the base URL and not rely on redirection. PATCH
+requests also failed in Python requests, but at least returned a more sensible
+<code>400 Bad Request</code>.</p>
+<p>Overall setting up HTTPS, despite requiring certificates to be requested from a
+third party, was very straightforward on Apache, with the only caveat being
+redirection with non-GET requests. I'll definitely be doing this more readily in
+the future.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Apache: <a href="http://httpd.apache.org">http://httpd.apache.org</a>
+        <p class="small_font">Official documentation for Apache</p>
+      </li>
+    
+      <li>
+        Web standard rfc2616: <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3">https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3</a>
+        <p class="small_font">Specifications for request redirection</p>
+      </li>
+    
+      <li>
+        Guide to setting up self-signed certificates: <a href="https://www.linux.com/learn/creating-self-signed-ssl-certificates-apache-linux">https://www.linux.com/learn/creating-self-signed-ssl-certificates-apache-linux</a>
+        
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2017/09/02/hid_devices_with_iokit.html">Programming HID devices in macOS with IOKit</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/bioinformatics/2019/07/16/gc_bias.html">Estimating GC bias in short-read WGS data</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

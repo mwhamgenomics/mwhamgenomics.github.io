@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Multiprocessing and the dark side of concurrency - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Multiprocessing and the dark side of concurrency</h2>
+
+<p>22 Nov 2019</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+</span></p>
+
+
+<p>Some of our automated processing at Edinburgh Genomics uses Python's <code>multiprocessing</code> standard library module to
+parallelise tasks. This opens some opportunities for things to get complicated at times, and we found this out a
+few months ago when we noticed SSL errors occurring seemingly at random from our software's interactions with web
+services.</p>
+<p>We were using <code>multiprocessing</code> as part of <a href="https://github.com/spotify/luigi">Luigi</a>, a pipelining framework
+developed by Spotify. Whereas the <code>threading</code> module spawns new threads and is therefore affected by Python's
+<a href="https://docs.python.org/3/glossary.html#term-global-interpreter-lock">Global Interpreter Lock</a>, <code>multiprocessing</code>
+parallelises tasks by splitting them off into different processes, bypassing the GIL and allowing true parallelism
+and use of multiple CPUs.</p>
+<p>At the time, we'd already been seeing randomly-occurring SSL errors in a process connecting to an internal web
+interface, and had <a href="https://github.com/EdinburghGenomics/EGCG-Core/pull/82">implemented a fix</a> for this. The fix
+used a Retry object from urllib3. This had to be added to a <code>requests.HTTPAdaptor</code> object, which in turn had to
+be mounted to a <code>requests.Session</code> object. This meant that instead of using <code>requests</code>' default methods, we had
+to build a custom Session object. At the time, we decided we might as well cache this Session object so we could
+use the same one when we made many requests in quick succession - unfortunately, this turned out to be the cause
+of our problems.</p>
+<p>When we put this change into production and still saw SSL errors, we had more searching to do. Eventually we found
+a couple of discussions <a href="https://github.com/kennethreitz/requests/issues/4323">here</a> and
+<a href="https://stackoverflow.com/questions/3724900/python-ssl-problem-with-multiprocessing/3724938">here</a>,
+implicating multiprocessing in the weirdness that we were seeing.</p>
+<p>When a new process is started with multiprocessing, the Python session is duplicated into the new process, along
+with all its existing objects. This can be proven by writing a short script:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">multiprocessing</span><br />&nbsp;<br /><span class="k">class</span> <span class="nc">Thing</span><span class="p">:</span><br />    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><br />        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><br />&nbsp;<br />    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><br />        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> at </span><span class="si">%s</span><span class="s1">: data=</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><br />&nbsp;<br /><span class="n">t</span> <span class="o">=</span> <span class="n">Thing</span><span class="p">()</span><br />&nbsp;<br /><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">proc_number</span><span class="p">):</span><br />    <span class="n">t</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">proc_number</span><br />    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In subprocess </span><span class="si">%i</span><span class="s1">: t is now </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">proc_number</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><br />&nbsp;<br /><span class="n">procs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span><br /><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span><br />    <span class="n">procs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,)))</span><br />&nbsp;<br /><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In main thread before multiprocesses: t is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span><br /><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">:</span><br />    <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span><br />&nbsp;<br /><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">:</span><br />    <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span><br />&nbsp;<br /><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In main thread after multiprocesses: t is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span><br />&nbsp;<br /><span class="n">run</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><br /><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In main thread after control experiment: t is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span><br /></pre></div><br /></div>
+
+<p>Here, we have some mutable data which is modified by various sub-processes, printing the results to stdout in the
+process. The result of running this is:</p>
+<pre><code>In main thread before multiprocesses: t is &lt;Thing at 0x102999c88: data=None&gt;
+In subprocess 4: t is now &lt;Thing at 0x102999c88: data=4&gt;
+In subprocess 2: t is now &lt;Thing at 0x102999c88: data=2&gt;
+In subprocess 1: t is now &lt;Thing at 0x102999c88: data=1&gt;
+In subprocess 3: t is now &lt;Thing at 0x102999c88: data=3&gt;
+In main thread after multiprocesses: t is &lt;Thing at 0x102999c88: data=None&gt;
+Modified t in process 0 to &lt;Thing at 0x102999c88: data=0&gt;
+In main thread after control experiment: t is &lt;Thing at 0x102999c88: data=0&gt;
+</code></pre>
+
+<p>As can be seen, the subprocesses modify <code>t</code> and report that they have successfully done so. After the
+multiprocessing has exited, though, it is reported that <code>t</code> has not changedin the main process. Modifying it then
+in the main process works as expected. The explanation for this behaviour is that each sub-process has its own
+copy of <code>t</code>. This approximately mirrored our setup - we had a global shared Session object, which was being called
+throughout our pipeline through Luigi tasks, which due to their use of <code>multiprocessing</code> ended up with their own copy
+of this Session object.</p>
+<p>The kicker here is that when you copy a Session object, the copy will be using the same SSL connection. If the
+original Session and the copy then both make a request at the same time, the data of both requests gets scrambled
+together on the same I/O stream.</p>
+<p>As discussed in the requests issue linked above, there is no generic way of solving this inside of <code>requests</code> or
+<code>multiprocessing</code>, so the solution was to handle the forking and Sessions ourselves. Fortunately, each process
+will have its own pid, so we were able to use <code>os.getpid()</code> to ensure that we were always using a different
+Session from the main process.</p>
+<p>I usually find that when there is a seemingly incomprehensible problem causing hours of headscratching, the
+solution is usually extremely simple. This rule is true here, except there is some complexity to the technical
+underpinnings of the problem, and it highlighted the complexities of concurrency and how, as with Python's
+Global Interpreter Lock, it sometimes helps to make demarcations of when and when not to use it.</p>
+
+<h3>External links</h3>
+
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/bioinformatics/2019/07/16/gc_bias.html">Estimating GC bias in short-read WGS data</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    (none)
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

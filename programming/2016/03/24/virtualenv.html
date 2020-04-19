@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Setting up virtual Python environments with virtualenv - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Setting up virtual Python environments with virtualenv</h2>
+
+<p>24 Mar 2016</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#python">python</a>, 
+  
+    <a href="/tags#environment">environment</a>
+  
+</span></p>
+
+
+<p>When I first started developing software in Python in my first job, I quickly ran into a problem that many people new to
+Python may ask, namely how to keep a consistent programming environment for a given project. How can I be sure which
+version of Python I'm on, and how can I keep track of the third-party modules I'm importing?</p>
+<p>Firstly, let's rule out installing everything on the machine's central Python instance. This is a bad idea for various
+reasons. Firstly, you might not have the right user permissions that machine. Secondly, what if your software is stable
+and you just want to let it sit there doing its job? If it's stable with Flask 0.10, then you don't particularly want
+someone to come along and update Flask to 0.11 because they need it for something else. Thirdly, the central Python
+install could be used by something important, and if you fiddle with it you can end up breaking things. The
+<a href="https://docs.python.org/3.4/using/mac.html">Python docs</a> specifically warn against modifying the central Python install
+on Mac OSX.</p>
+<p>It's perfectly possible to use <code>make altinstall</code> during setup, and have <code>python2</code> and <code>python3</code> executables side by side
+in <code>/usr/bin</code>, however what if you want to distinguish between Python 3.4 and 3.5?</p>
+<p>Keeping track of modules per project also has its challenges. You might keep a folder of modules for each project you
+have, and then point to the right one using <code>PYTHONPATH</code>. This, however, is quite a lot of work. Rather than going
+through Python's <code>pip</code> package manager, you're building each module manually. There is also nothing linking the modules
+to the Python version - you could end up trying to import Python 3 modules into Python 2.</p>
+<p>Fortunately, there's a proper way of doing it all: virtualenv.</p>
+<p>(Edit: as of Python 3.3, there's a standard library module called <code>venv</code> which I didn't know about at the time I wrote
+this, but works in pretty much the same way.)</p>
+<h2>virtualenv</h2>
+<p>Virtualenv is a Python module that allows you to set up isolated instances of Python, each with their own executables
+and libraries. Simply install it on one Python instance, and use that as a 'master' for setting up virtualenvs:</p>
+<pre><code>[mwhamgenomics]$ pip install virtualenv
+</code></pre>
+<p>You can now call virtualenv in one of two equivalent ways:</p>
+<pre><code>[mwhamgenomics]$ virtualenv path/to/new_virtualenv
+[mwhamgenomics]$ python -m virtualenv path/to/new_virtualenv
+</code></pre>
+<p>This will create an isolated instance of Python in the specified location. To use the new virtualenv, simply call the
+interpreter or any related executable (pip, etc.) in its <code>bin</code> dir. Any modules you install using the virtualenv's pip
+will be put in its <code>lib</code>, and any new executables created (e.g, py.test) will be put in its <code>bin</code>.</p>
+<p>You can also bind this virtualenv to your shell session by sourcing the <code>activate</code> script in <code>bin</code>:</p>
+<pre><code>[mwhamgenomics]$ which python
+/usr/bin/python
+[mwhamgenomics]$ source path/to/new_virtualenv/bin/activate
+(new_virtualenv) [mwhamgenomics]$ which python
+path/to/new_virtualenv/bin/python
+(new_virtualenv) [mwhamgenomics]$ which pip
+path/to/new_virtualenv/bin/pip
+</code></pre>
+<p>You will notice that it modifies your command line with the virtualenv's name in brackets. You can also deactivate the
+virtualenv like so:</p>
+<pre><code>[mwhamgenomics]$ deactivate
+</code></pre>
+<p>In production, you would deploy your program with a virtualenv sitting somewhere alongside, with any necessary modules
+for running the program. By using isolated virtual Python instances, you can link a distinct Python instance to each of
+your projects, keeping your environment predictable, the machine clean, and the project insulated against system
+changes.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Virtualenv documentation: <a href="https://virtualenv.pypa.io">https://virtualenv.pypa.io</a>
+        <p class="small_font">Full documentation for virtualenv</p>
+      </li>
+    
+      <li>
+        RVM post: <a href="{{ site.baseurl }}/programming/2016/03/24/rvm.html">{{ site.baseurl }}/programming/2016/03/24/rvm.html</a>
+        <p class="small_font">See here for a post on RVM, Ruby's equivalent of virtualenv</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2016/03/24/rvm.html">Setting up virtual Ruby environments with RVM</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/music/2016/05/27/tritone_substitutions.html">Tritone substitutions</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

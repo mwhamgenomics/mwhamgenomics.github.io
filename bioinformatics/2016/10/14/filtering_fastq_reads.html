@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Filtering fastq reads: adventures in optimisation - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Filtering fastq reads: adventures in optimisation</h2>
+
+<p>14 Oct 2016</p>
+
+
+
+<p>Category: <a href="/bioinformatics">bioinformatics</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#python">python</a>, 
+  
+    <a href="/tags#c">c</a>
+  
+</span></p>
+
+
+<p>Part of Edinburgh Genomics' <a href="http://github.com/EdinburghGenomics/Analysis-Driver">pipeline</a> is to process BCL base call
+files from an Illumina HiSeqX into fastq files. Most of the work is done by an Illumina program called
+<a href="http://support.illumina.com/downloads/bcl2fastq-conversion-software-v217.html">bcl2fastq</a>, but we found a problem with
+the fastqs generated: some of the reads were very short - less than 36 bases. It turned out that these were DNA adapters
+used in the sequencing, and didn't actually contain any real sequence data. As a result, we had to remove these from the
+fastqs by scanning each pair and, if either the R1 or R2 for each read was too short, remove it. Take the example fastq
+pair below:</p>
+<p>R1.fastq:</p>
+<pre><code>@read1 len 8
+ATGCATGC
++
+#--------
+@read2 len 6
+ATGCAT
++
+#------
+@read3 len 3
+ATG
++
+#---
+@read4 len 9
+ATGCATGCA
++
+#---------
+</code></pre>
+<p>R2.fastq</p>
+<pre><code>@read1 len 9
+ATGCATGCA
++
+#---------
+@read2 len 3
+ATG
++
+#---
+@read3 len 8
+ATGCATGC
++
+#--------
+@read4 len 7
+ATGCATG
++
+#-------
+</code></pre>
+<p>Here, with a read length threshold of 4, reads 2 and 3 should be filtered out of both fastqs, leaving us with an R1 and
+an R2 each containing a <code>@read1</code> and a <code>@read4</code>.</p>
+<p>To solve this problem, we initially used a program called <a href="https://github.com/najoshi/sickle">Sickle</a>, which does the
+job but is quite slow, taking up to 6 hours to process a full set of fastqs from a good HiSeqX run. We first
+hypothesised that the slowdown was because Sickle implements a sliding window. Sliding windows are a common statistical
+technique in bioinformatics where, for each base in a DNA sequence, a 'score' (of base quality, GC content or whatever)
+is calculated from all the surrounding bases. Naturally, this means that Sickle does a lot of potentially expensive
+logic beyond simply calculating read lengths.</p>
+<p>Sickle took about 90 mins to process a pair of 4 Gb example fastq files. In an attempt to optimise this stage, we
+decided to try rolling our own fastq filterer.</p>
+<h2>Implementation</h2>
+<p>Firstly, we introduced another control alongside Sickle. A Python implementation of the functionality described above
+took about 4.5 hours to process the aforementioned pair of 4 Gb fastqs. Now we know that Sickle may be slow, but not
+that slow! However, having implemented the necessary logic ourselves, we now know how to solve the problem - it's just a
+matter of optimising for speed.</p>
+<h2>C</h2>
+<p>We decided to try a different implementation of the above Python script in C. Despite the popularity of high level
+languages like Python, Perl, R, etc. in bioinformatics, C has retained popularity where it's important to be able to fly
+through a huge text file at high speed. Our C program would have a series of relatively simple tasks: read in a pair of
+corresponding reads from two fastq files, check both sequences and, if both were long enough, add them to a pair of
+corresponding output files.</p>
+<p>Firstly, we had to stream in GZ compressed data from two fastq files (since data files are almost always compressed in
+bioinformatics), and then read that uncompressed data in line by line. This is possible using functions from C's <code>zlib</code>
+library, and is discussed in the companion article on C.</p>
+<h2>Compressing output data</h2>
+<p>Because data files are usually GZ compressed, our script needs to be able to output <code>fastq.gz</code> files. Once again, <code>zlib</code>
+is capable of this, however when we ran it, it turned out to be about the same speed as Sickle, despite not doing any of
+Sickle's sliding windows or quality filtering! Clearly, our original sliding-window-slowdown hypothesis was wrong, and
+the rate-limiting step was something else.</p>
+<p>We next tried removing data compression/decompression from the script (i.e, reading and writing uncompressed fastqs),
+which improved performance significantly. It turned out that the rate-limiting step in our C script was compression of
+output data. Fortunately, it is possible to compress data in parallel with a multi-threaded version of <code>gz</code>:
+<a href="https://github.com/madler/pigz">Pigz</a> by Mark Adler, co-developer of <code>zlib</code>. If we could output uncompressed data from
+our script and pipe that into Pigz, we might be able to get some good results.</p>
+<p>The number of output files meant that we couldn't use simple Unix pipes, however Bash has solutions for this, as
+discussed in the companion article on Bash IO.</p>
+<h2>Conclusions</h2>
+<p>Our fastq filterer now reads in GZ compressed data with <code>zlib</code>, does read length filtering, and then uses Bash
+constructs to write compressed output data via Pigz. Using this approach, we were able to get the processing time for a
+pair of 4 Gb fastqs down from an hour and a half to about 5 minutes.</p>
+<p>This improvement in performance was less dramatic when working with full-size test files, however we still found the
+script to run in about 1/5th or 1/6th of the time Sickle was taking. As of this writing, we are now working to integrate
+this new C script into our pipeline, allowing us to filter fastq reads much more quickly than before.</p>
+<ol>
+<li>C is fast - really fast! Remember that an equivalent fastq filtering script in Python took about 3 times as long to
+   run as Sickle or our initial C script.</li>
+<li>While things like GZ compression can slow down programs, C is so fast that sliding windows, quality filtering and GZ
+   decompression can be done without such significant slow-downs.</li>
+<li>Multithreading of GZ compression is not only possible, but also very effective. I'll definitely be using Pigz more in
+   the future.</li>
+</ol>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Sickle: <a href="https://github.com/najoshi/sickle">https://github.com/najoshi/sickle</a>
+        <p class="small_font">While we have only needed length trimming in our pipeline, Sickle is also capable of trimming fastq reads by quality.</p>
+      </li>
+    
+      <li>
+        EGCG Fastq-Filterer: <a href="https://github.com/EdinburghGenomics/Fastq-Filterer">https://github.com/EdinburghGenomics/Fastq-Filterer</a>
+        <p class="small_font">Source code for the fastq filtering program we developed.</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2016/07/29/web_app_4_apache.html">Building a web app part 4 - Running multiple Flask apps on Apache</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2016/10/16/c.html">Simple file processing in C</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

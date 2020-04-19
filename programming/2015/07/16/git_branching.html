@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Git branching - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Git branching</h2>
+
+<p>16 Jul 2015</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#version control">version control</a>, 
+  
+    <a href="/tags#environment">environment</a>
+  
+</span></p>
+
+
+<p>If multiple people are working on a Git project, they should ideally not work directly on the master branch. Instead,
+when they want to add something to the project, they should create a separate branch on which they make changes, test,
+debug, etc, and and then merge that branch back to master when ready. This way, the master is always fully functional.
+Modern development environments often have functionality to aid version control and branching, but this post aims to
+discuss how to use branches via the plain command line.</p>
+<h2>Create a branch</h2>
+<p>This can be done on the command line with either of two commands:</p>
+<pre><code>[mwhamgenomics]$ git checkout -b my_branch
+[mwhamgenomics]$ git branch -d my_branch
+</code></pre>
+<p>You can have multiple local branches and switch between them with <code>git checkout</code>.</p>
+<p>There are a few different ways of using branches in Git. You might choose to use feature branches, where you open a
+branch specifically for adding or modifying one part of the project, push to it, then merge it. Alternatively, you might
+have a 'develop' branch, where you make whatever changes and merge into master again and again over time. There are
+different reasons for using each, and it really comes down to the preferences of the person/team.</p>
+<p>To push a local branch to the remote for the first time, run:</p>
+<pre><code>[mwhamgenomics]$ git push -u origin my_branch
+</code></pre>
+<p>You can work on this branch, committing and pushing changes. Then when you think it's ready to be put into
+staging/production, you can request to have it merged. This would be a pull request on GitHub, a merge request on
+GitLab, or whatever equivalent your Git server may have.</p>
+<h2>Pull request</h2>
+<p>It's usually a good idea to assign the request to someone else for peer review. The person reviewing the request can
+then discuss it with you, request further changes, and then close or approve it.</p>
+<h2>Merge conflicts</h2>
+<p>Merging of two branches can usually be done automatically by Git, and is done automatically when a pull request is
+approved. However, it can get complicated if there are merge conflicts, which usually arise when your branch and the
+master has diverged (e.g. someone else merges their branch to the master just before you). A GitHub pull request should
+show whether you have merge conflicts. To fix merge conflicts, while in your branch, run:</p>
+<pre><code>[mwhamgenomics]$ git pull origin master
+</code></pre>
+<p>Git should complain about conflicts and give you a list of offending files. The next step is to go in and (very
+carefully!) fix these files, which Git should have annotated with details of each conflict. Then add/commit/push the
+changes. This must be done carefully, because it is perfectly possible to overwrite legitimate changes from other
+people.</p>
+<h2>Delete branch</h2>
+<p>Once the branch has been merged and you don't intend to use it further, it can be deleted. This should be done both on
+GitHub and locally. To do it locally:</p>
+<pre><code>[mwhamgenomics]$ git checkout master
+[mwhamgenomics]$ git pull  # The master should now have all the changes
+[mwhamgenomics]$ git branch -d my_branch  # does nothing if branch hasn't been merged. Use -D to force-delete
+</code></pre>
+<h2>Things that should not be in Git repos</h2>
+<ul>
+<li>Passwords. 'Nuff said.</li>
+<li>Command histories from interactive shells (.Rhistory, .python_history, etc.).</li>
+<li>Large data files. The amount of data stored locally is multiplied per user per branch, and you can end up taking up a
+  lot of space.</li>
+<li>You may have to store some things though, like images.</li>
+</ul>
+<h2>.gitignore</h2>
+<p>This is a file that you can create in the repo's root directory. A .gitignore tells Git what files to ignore when
+detecting changes to commit. Syntax uses Linux-style paths and wildcards. Use a trailing slash to denote a directory.
+For example:</p>
+<pre><code>.python_history
+__pycache__/
+this/that/other.txt
+one/two/*/*.sh
+</code></pre>
+
+<h3>External links</h3>
+
+
+
+<p>
+  Previous post:
+  
+    (none)
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/jekyll_update/2016/02/18/welcome_to_jekyll.html">Welcome to Jekyll!</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>

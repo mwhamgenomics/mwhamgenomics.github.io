@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Setting up virtual Ruby environments with RVM - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Setting up virtual Ruby environments with RVM</h2>
+
+<p>24 Mar 2016</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#environment">environment</a>
+  
+</span></p>
+
+
+<p>When I was first building this website, I needed to set up Jekyll so I could build a development instance of this site.
+For this, I had to set up a Ruby development environment. If you've seen my post on using
+<a href="/programming/2016/03/24/virtualenv.html">virtualenv</a>, you might be getting a bit of déjà vu. Fortunately, as with
+Python, there is a proper way of setting up isolated Ruby instances, namely RVM.</p>
+<p>RVM works in a similar way to virtualenv, with a few minor differences. Instead of a module that you install to an
+interpreter and use to set up environments in a given location, RVM is a single program that lives in your home -
+<code>~/.rvm/</code>. All Ruby environments created will also go here, and you then call RVM to select one. In the end, however, it
+does the same job as virtualenv and solves the same problems.</p>
+<h2>Installation</h2>
+<p>RVM is installed via a <a href="https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer">script</a> found in the
+RVM GitHub project (you can also use <a href="http://get.rvm.io">get.rvm.io</a>, which is a redirect). Simply download this script
+and run it:</p>
+<pre><code>[mwhamgenomics]$ curl -o rvm_installer.sh https://raw.githubusercontent.com/rvm/rvm/master/binscripts/rvm-installer
+[mwhamgenomics]$ sh rvm_installer.sh stable  # or 'master' for the latest dev version of RVM
+</code></pre>
+<p>At this point, your <code>.bash_profile</code> shell config is modified to include the RVM executable and some helper functions. To
+get these, either reload your session or source the relevant files:</p>
+<pre><code>[mwhamgenomics]$ source ~/.profile
+[mwhamgenomics]$ source ~/.rvm/scripts/rvm
+</code></pre>
+<p>Now RVM is ready to use. Calling it with no arguments prints usage information, including what actions are available:
+- use - set RVM to use an installed Ruby environment
+- install - install a version of Ruby
+- uninstall - uninstall a version of Ruby
+- list known - search for available Ruby versions</p>
+<p>Installation of a new Ruby version would go something like:</p>
+<pre><code>[mwhamgenomics]$ rvm list
+(shows installed Ruby versions)
+[mwhamgenomics]$ rvm list known
+(searches for available Ruby versions)
+[mwhamgenomics]$ rvm install 2.3.0
+[mwhamgenomics]$ which ruby
+/home/mwhamgenomics/.rvm/rubies/ruby-2.3.0/bin/ruby
+[mwhamgenomics]$ which gem
+/home/mwhamgenomics/.rvm/rubies/ruby-2.3.0/bin/gem
+</code></pre>
+<p>(Note: RVM on OSX requires Homebrew. When using RVM for the first time, you may be asked to install it. As far as Jekyll
+is concerned, you can specify an isolated non-root location for Homebrew, but this is not recommended for general
+Homebrew use)</p>
+<h2>Gemsets</h2>
+<p>All RVM has done up to this point is manage Ruby versions. What about managing all your Ruby Gems per project? RVM does
+this via gemsets.</p>
+<pre><code>[mwhamgenomics]$ rvm gemset list
+(lists all gemsets for the current Ruby environment)
+[mwhamgenomics]$ rvm gemset create &lt;gemset_name&gt;
+[mwhamgenomics]$ rvm gemset use &lt;gemset_name&gt;
+</code></pre>
+<p>This way, you can keep your Gems tied to a project as virtualenv does.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        RVM documentation: <a href="https://rvm.io">https://rvm.io</a>
+        <p class="small_font">Official site and full documentation for RVM</p>
+      </li>
+    
+      <li>
+        virtualenv post: <a href="{{ site.baseurl }}/programming/2016/03/24/virtualenv.html">{{ site.baseurl }}/programming/2016/03/24/virtualenv.html</a>
+        <p class="small_font">See here for a post on virtualenv, Python's equivalent of RVM</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/jekyll_update/2016/03/14/first_post.html">First post</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    <a class="post-meta" href="/programming/2016/03/24/virtualenv.html">Setting up virtual Python environments with virtualenv</a>
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>
