@@ -1,7 +1,7 @@
 ---
 extends: post.html
 title: Building a web app - Introduction
-date: 2016-07-15
+date: 2016-07-15 12:00:00
 category: programming
 tags: ['web development', 'reporting app']
 external_links:

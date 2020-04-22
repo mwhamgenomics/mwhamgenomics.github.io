@@ -1,7 +1,7 @@
 ---
 extends: post.html
 title: Building a web app part 2 - Flask front end
-date: 2016-07-15
+date: 2016-07-15 16:00:00 
 category: programming
 tags: ['python', 'web development', 'reporting app']
 external_links:

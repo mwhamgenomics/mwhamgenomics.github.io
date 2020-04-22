@@ -1,7 +1,7 @@
 ---
 extends: post.html
 title: Building a web app part 1 - NoSQL and Eve
-date: 2016-07-15
+date: 2016-07-15 14:00:00 
 category: programming
 tags: ['python', 'web development', 'reporting app']
 external_links:
