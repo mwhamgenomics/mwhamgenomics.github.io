@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Website updates 2020 - Genomics in B♭</title>
+    <meta name="description" content="Biology, programming, music.">
+    <link rel="stylesheet" href="/css/picnic.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    
+      <header>
+      <nav>
+        <a href="/" class="brand">
+            <img src="/img/mwhamgenomics.png" width="20" height="20" />
+            Genomics in B<span class="music">♭</span>
+        </a>
+
+        <input id="minimenu" type="checkbox" class="show">
+        <label for="minimenu" class="burger pseudo button"><img class="icon_large" src="/img/menu.svg" /></label>
+
+        <div class="menu">
+          <a href="/archive">All posts</a>
+          <a href="/bioinformatics">Bioinformatics</a>
+          <a href="/programming">Programming</a>
+          <a href="/music">Music</a>
+          <span class="divider"></span>
+          <a href="/tags">Tags</a>
+          <a href="/linux">Linux reference</a>
+        </div>
+
+      </nav>
+    </header>
+    
+
+    <div class="flex one two-800">
+      <div class="three-fourth-800">
+<h2>Website updates 2020</h2>
+
+<p>27 Apr 2020</p>
+
+
+
+<p>Category: <a href="/programming">programming</a></p>
+
+
+
+<p>Tags: <span>
+  
+    <a href="/tags#web development">web development</a>
+  
+</span></p>
+
+
+<p>Current events have given me a lot of time in the evenings to catch up on side projects, one of which was an update of
+this website. I'd been wanting to do this for a while, but pretty much since mid-2019 had been too busy. For the last
+month or so I have been overhauling it behind the scenes and the end result is now live.</p>
+<h2>Static site builders</h2>
+<p>Initially I built this site with <a href="https://jekyllrb.com">Jekyll</a>, but eventually grew tired of some of the boundaries I
+had to work within:</p>
+<ul>
+<li>I wanted slicker syntax highlighting of code blocks. I didn't like the way Jekyll made me call it with HTML template
+  syntax like <code>{% highlight python %}</code>, rather than Markdown backquote syntax.</li>
+<li>I had to name the files for new posts with a date-stamp in front. This makes it easy to view them by date, but most of
+  the time I want to view them by subject. If you write a post about, say, RVM, and want to find it later, you'd want to
+  look for 'rvm' in the file name, not a datestamp for whatever date you wrote it on.</li>
+<li>Rather than a clean slate, there was a lot of pre-existing CSS and Sass code when I first got started with the Jekyll
+  placeholders, and I didn't really know what I should and shouldn't edit.</li>
+<li>Jekyll is designed to do a lot for you, but on the flip side that means when there's a problem, it's not so easy to
+  see whether the cause is a problem with the site source or some Jekyll behind-the-scenes trickery.</li>
+<li>I wanted something transparent that could build a tree of source files to be translated to an equivalent site map,
+  but would also be easy for me to extend - I'm not enough of a Ruby programmer to start writing Jekyll plugins.</li>
+</ul>
+<p>GitHub Pages is able to host any static files in the repo's master branch, so I could just add HTML files built by hand
+or any static site builder. After a look at Jekyll alternatives, I asked myself the same question that any sane,
+well-adjusted programmer does: how hard can it be to just roll my own? I figured that if I could build a combination of
+Markdown processing, HTML templating and post metadata handling, not only would I be able to pare it down to just the
+bits I needed, it would also be an interesting learning experience. The result is about 450 lines of site building code
+using <a href="https://python-markdown.github.io">Python-Markdown</a>, <a href="https://jinja.palletsprojects.com">Jinja2</a> and
+<a href="https://pygments.org">Pygments</a>.</p>
+<h2>Simpler CSS</h2>
+<p>I was also initially doing styling with Bootstrap, which is used for many large web projects but I've found it to be
+overkill for small static sites. The source code of Bootstrap's CSS base runs to over 10,000 lines even before adding
+Javascript interactivity. The heavy use of CSS classes and the verbose and repetitive language necessary for defining
+even something like a small navbar was starting to get to me:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;navbar navbar-expand-lg navbar-light bg-light&quot;</span><span class="p">&gt;</span><br />  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;navbar-brand&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>A navbar<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;navbar-toggler&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;button&quot;</span> <span class="na">data-toggle</span><span class="o">=</span><span class="s">&quot;collapse&quot;</span> <span class="na">data-target</span><span class="o">=</span><span class="s">&quot;#navbar_content&quot;</span> <span class="na">aria-controls</span><span class="o">=</span><span class="s">&quot;navbar_content&quot;</span> <span class="na">aria-expanded</span><span class="o">=</span><span class="s">&quot;false&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;Toggle nav&quot;</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;navbar-toggler-icon&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span><br />  <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span><br />&nbsp;<br />  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;collapse navbar-collapse&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;navbar_content&quot;</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;navbar-nav mr-auto&quot;</span><span class="p">&gt;</span><br />      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-item active&quot;</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />      <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span><br />      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-item&quot;</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>This<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />      <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span><br />      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-item&quot;</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>That<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />      <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span><br />      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-item&quot;</span><span class="p">&gt;</span><br />        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;nav-link&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>Other<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />      <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span><br />    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span><br />  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span><br /><span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span><br /></pre></div><br /></div>
+
+<p>So at the same time as building my own static site generator, I was looking at
+<a href="https://github.com/troxler/awesome-css-frameworks">alternative CSS frameworks</a>. While writing the site builder
+happened fairly naturally, I spent a lot of time puzzling over how I wanted to style it. I wanted something relatively
+lightweight but still responsive and mobile-friendly. I'm also not hardcore enough to build a website style from
+scratch, so I was fine with the framework being 'opinionated' and guiding you towards doing things a certain way. After
+trying a few frameworks and CSS resets, I decided on <a href="https://picnicss.com">Picnic</a>, which has a responsive
+grid system but is otherwise relatively classless. This means that the HTML for defining a navbar is a bit nicer:</p>
+<div class="code"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span><br />  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;brand&quot;</span><span class="p">&gt;</span>A Navbar<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;minimenu&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;show&quot;</span><span class="p">&gt;</span><br />  <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;minimenu&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;burger pseudo button&quot;</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;icon_large&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/img/menu.svg&quot;</span> <span class="p">/&gt;&lt;/</span><span class="nt">label</span><span class="p">&gt;</span><br />&nbsp;<br />  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;menu&quot;</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;divider&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>This<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>That<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>Other<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span><br />  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span><br />&nbsp;<br /><span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span><br /></pre></div><br /></div>
+
+<p>This then is a two-part exercise in minimalism - my own small rebellion against the endless DOM tree nesting,
+Javascript dependencies, myriad UI frameworks and other excesses of modern web development.</p>
+<p>While I'm happy with the result, there are still some improvements I can make. The new site's workflow is definitely not
+as polished as Jekyll's at the moment. The built files have to sit in master, so the source files have to be somewhere
+else in a separate branch or repo. This means that whenever I want to update the site, I have to push changes twice.
+This may or may not be fixable - on the face of it, GitHub Pages seems to be fairly tightly integrated with Jekyll and
+there's no documentation on how to use anything other than Jekyll, but it may be possible to
+<a href="https://docs.travis-ci.com/user/deployment/pages">streamline the process with TravisCI</a>. I'll see if I can get that to
+work later.</p>
+
+<h3>External links</h3>
+
+
+  <ul>
+    
+      <li>
+        Jekyll official site: <a href="https://jekyllrb.com">https://jekyllrb.com</a>
+        <p class="small_font">Jekyll, the officially supported static site builder for GitHub Pages</p>
+      </li>
+    
+      <li>
+        Picnic CSS: <a href="https://picnicss.com">https://picnicss.com</a>
+        <p class="small_font">Picnic CSS, the styling framework I switched this site to</p>
+      </li>
+    
+  </ul>
+
+
+<p>
+  Previous post:
+  
+    <a class="post-meta" href="/programming/2019/11/22/multiprocessing.html">Multiprocessing and the dark side of concurrency</a>
+  
+</p>
+
+<p>
+  Next post:
+  
+    (none)
+  
+</p>
+
+
+</div>
+
+      
+      <div class="fourth-800">
+        <div class="sidebar">
+          <h4>Genomics in B♭</h4>
+          <p>
+            <i class="fa fa-flask"></i> Biology<br/>
+            <i class="fa fa-terminal"></i> Programming<br/>
+            <i class="fa fa-music"></i> Music
+          </p>
+
+          <p>
+            Built with <a href="https://python-markdown.github.io">Python-Markdown</a> and
+            <a href="https://jinja.palletsprojects.com">Jinja2</a>. Styled with
+            <a href="https://pygments.org">Pygments</a>, <a href="https://picnicss.com">Picnic CSS</a> and
+            <a href="https://fontawesome.com">Font Awesome</a>. Hosted on
+            <a href="https://pages.github.com">GitHub Pages</a>.
+          </p>
+          <a href="https://www.github.com/mwhamgenomics"><i class="fa fa-github"></i> mwhamgenomics</a>
+        </div>
+      </div>
+      
+
+    </div>
+
+    
+    <footer>
+        <p>© http://github.com/mwhamgenomics</p>
+    </footer>
+    
+
+  </body>
+
+</html>
