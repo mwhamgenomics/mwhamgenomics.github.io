@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ page.metadata.title }}</h2>
+
+{% if page.metadata.human_readable_date %}<p>{{ page.metadata.human_readable_date }}</p>{% endif %}
+{% if page.metadata.author %}<p>{{ page.metadata.author }}</p>{% endif %}
+
+{% if page.metadata.category != null %}
+<p>Category: <a href="/{{ page.metadata.category }}">{{ page.metadata.category }}</a></p>
+{% endif %}
+
+{% if page.metadata.tags != null %}
+<p>Tags: <span>
+  {% for tag in page.metadata.tags %}
+    <a href="/tags#{{ tag }}">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+  {% endfor %}
+</span></p>
+{% endif %}
+
+{% block post_content %}{% endblock %}
+
+<h3>External links</h3>
+
+{% if page.metadata.external_links %}
+  <ul>
+    {% for link in page.metadata.external_links %}
+      <li>
+        {{ link.title }}: <a href="{{ link.link }}">{{ link.link }}</a>
+        {% if link.description %}<p class="small_font">{{ link.description }}</p>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<p>
+  Previous post:
+  {% if page.metadata.previous %}
+    <a class="post-meta" href="{{ page.metadata.previous.url }}">{{ page.metadata.previous.metadata.title }}</a>
+  {% else %}
+    (none)
+  {% endif %}
+</p>
+
+<p>
+  Next post:
+  {% if page.metadata.next %}
+    <a class="post-meta" href="{{ page.metadata.next.url }}">{{ page.metadata.next.metadata.title }}</a>
+  {% else %}
+    (none)
+  {% endif %}
+</p>
+
+
+{% endblock %}
