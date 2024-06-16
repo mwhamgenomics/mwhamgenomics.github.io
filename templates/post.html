@@ -3,15 +3,15 @@
 {% block content %}
 <h2>{{ page.metadata.title }}</h2>
 
-{% if page.metadata.human_readable_date %}<p>{{ page.metadata.human_readable_date }}</p>{% endif %}
-{% if page.metadata.author %}<p>{{ page.metadata.author }}</p>{% endif %}
+{% if page.metadata.human_readable_date %}<p class="metadata">{{ page.metadata.human_readable_date }}</p>{% endif %}
+{% if page.metadata.author %}<p class="metadata">{{ page.metadata.author }}</p>{% endif %}
 
 {% if page.metadata.category != null %}
-<p>Category: <a href="/{{ page.metadata.category }}">{{ page.metadata.category }}</a></p>
+<p class="metadata">Category: <a href="/{{ page.metadata.category }}">{{ page.metadata.category }}</a></p>
 {% endif %}
 
 {% if page.metadata.tags != null %}
-<p>Tags: <span>
+<p class="metadata">Tags: <span>
   {% for tag in page.metadata.tags %}
     <a href="/tags#{{ tag }}">{{ tag }}</a>{% if not loop.last %}, {% endif %}
   {% endfor %}
@@ -33,7 +33,7 @@
   </ul>
 {% endif %}
 
-<p>
+<p class="metadata">
   Previous post:
   {% if page.metadata.previous %}
     <a class="post-meta" href="{{ page.metadata.previous.url }}">{{ page.metadata.previous.metadata.title }}</a>
@@ -42,7 +42,7 @@
   {% endif %}
 </p>
 
-<p>
+<p class="metadata">
   Next post:
   {% if page.metadata.next %}
     <a class="post-meta" href="{{ page.metadata.next.url }}">{{ page.metadata.next.metadata.title }}</a>

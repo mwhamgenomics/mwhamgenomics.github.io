@@ -94,7 +94,7 @@ footer {
 }
 
 .sidebar {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
   border-radius: 4px;
@@ -114,6 +114,7 @@ footer {
 
 .small_font {
   font-size: 0.95rem;
+  margin-top: 0rem;
 }
 
 .highlight > pre {
@@ -138,10 +139,24 @@ figure > img {
 
 figure > p {
   font-size: 0.85rem;
+  margin-top: 0rem;
+}
+
+p {
+  margin-bottom: 0rem;
+}
+
+p.metadata {
+  margin-top: 0rem;
 }
 
 h1, h2, h3, h4 {
   font-weight: normal;
+  padding: 0rem;
+}
+
+h2 {
+  margin-top: 1rem;
 }
 
 .badge {

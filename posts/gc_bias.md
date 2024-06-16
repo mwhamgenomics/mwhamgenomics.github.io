@@ -55,19 +55,17 @@ In reality there is always some GC bias even in good short-read data, but here w
 even in areas of moderately high GC for some library preps. For an example, see the plots below, generated from
 [picardtools](http://broadinstitute.github.io/picard/command-line-overview.html#CollectGcBiasMetrics):
 
-<div class="container" style="margin: 0; width: 100%;">
-    <div class="row">
-        <div class="col-sm-6">
-            <img class="jpeg" src="/img/non_biased_coverage.jpg" alt="non_biased_coverage" />
-            <small>Non GC-biased</small>
-        </div>
-        <div class="col-sm-6">
-            <img class="jpeg" src="/img/biased_coverage.jpg" alt="biased_coverage" />
-            <small>GC-biased</small>
-        </div>
-    </div>
-</div>
-<br/>
+
+<figure>
+  <img src="/img/non_biased_coverage.jpg" alt="non_biased_coverage" />
+  <p>Non GC-biased</p>
+</figure>
+
+<figure>
+  <img src="/img/biased_coverage.jpg" alt="biased_coverage" />
+  <p>GC-biased</p>
+</figure>
+
 
 Here, coverage metrics are collected for areas along the sequenced genome and grouped by GC content bins, i.e.
 areas that are 0% GC, 1% GC, 2% GC, etc. all the way up to 100%. What distinguishes the GC-biased sample here is
@@ -87,9 +85,10 @@ through the data points and measuring its gradient. To do this, we used
 [SciPy](https://scipy.org/). This algorithm essentially draws a line of best fit (shown below in red) through the
 input data points and returns a slope/gradient value:
 
-<img class="jpeg jpeg_small" src="/img/theil_sen.jpg" alt="theil_sen" />
-<br/>
-<small>Theil-Sen estimation</small>
+<figure>
+  <img src="/img/theil_sen.jpg" alt="theil_sen" />
+  <p>Theil-Sen estimation</p>
+</figure>
 
 If this value is sufficiently low or high (i.e. the line is steep enough), then we can interpret this as
 significant GC bias. We filtered the data points used in this estimation to only those between 20% and 80% GC,
@@ -103,9 +102,10 @@ estimation to see if it was also an effective measurement. For each data point, 
 absolute of the coverage value, which is effectively the equivalent of taking a ruler and measuring the distance
 on the graph between the data point and the normal - again shown below in red:
 
-<img class="jpeg jpeg_small" src="/img/normal_deviation.jpg" alt="normal_deviation" />
-<br/>
-<small>Normal deviation</small>
+<figure>
+  <img src="/img/normal_deviation.jpg" alt="normal_deviation" />
+  <p>Normal deviation</p>
+</figure>
 
 This gives us a set of deviation values, which we can then take an average of. We did however use a different way
 of filtering which data points to use. In Theil-Sen, we simply took all data points between 20% GC and 80% GC
@@ -148,9 +148,10 @@ def deviation_from_normal(lines):
 
 Running the above algorithms on our 40 samples gave the following violin plots:
 
-<img class="jpeg" src="/img/comparison.jpg" alt="comparison" />
-<br/>
-<small>Violin plots of both metrics discussed above, for known biased/unbiased samples</small>
+<figure>
+  <img src="/img/comparison.jpg" alt="comparison" />
+  <p>Violin plots of both metrics discussed above, for known biased/unbiased samples</p>
+</figure>
 
 For both metrics, biased samples are clearly separated from non-biased, differing by an order of magnitude. This
 shows that 1) it is possible to distinguish GC-biased from non GC-biased samples with a single metric, and 2) the

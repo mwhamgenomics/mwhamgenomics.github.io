@@ -1,6 +1,6 @@
 ---
 extends: post.html
-title: Multiprocessing and the dark side of concurrency
+title: Multiprocessing and the weird side of concurrency
 date: 2019-11-22
 category: programming
 tags: []
