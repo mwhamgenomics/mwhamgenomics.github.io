@@ -25,7 +25,7 @@ solution to this problem in C.
 Firstly, despite knowing it would be slow, we decided to 'sketch' an implementation in pure Python:
 
 ```python
-def filter(r1i, r2i, r1o, r2o, threshold):
+def filter(r1i, r2i, r1o, r2o, len_threshold):
     while True:
         r1_header = r1i.readline()
         r1_seq = r1i.readline()
@@ -45,7 +45,7 @@ def filter(r1i, r2i, r1o, r2o, threshold):
 Here, we see a good example of the trade-off between processing speed and development speed. We had a full Python script
 implementing the above functionality in about 10-15 minutes, however it took about 3 times the time that Sickle took to
 process a pair of 4 Gb fastqs. This may look like an unsuccessful experiment, but it's perfectly appropriate to sketch a
-solution in a high-level language before optimising in something like C, which has a much faster running speed, but a
+solution in a high-level language before optimising in something like C, which has a much faster running speed but a
 much slower development speed.
 
 
@@ -78,11 +78,11 @@ function seems fairly easy to follow. The function `fgets` is used to read in te
 line of the function, however, appears completely unfamiliar. Another thing that I at first didn't understand from
 browsing C code was the seemingly random scattering of asterisks (`*`) around variable names and function declarations.
 
-What the asterisk (`*`) does is declare a pointer - a variable that, rather than storing some data itself, stores the
+In C, an asterisk (`*`) declares a pointer - a variable that, rather than storing some data itself, stores the
 location of some data in memory. The first line, then, declares a `char` pointer. `malloc` is part of C's memory
 management - here, we allocate the `line` char pointer enough memory to store 1024 characters (a char is one byte
 anyway, but other data types can be more). Now that the `line` pointer has access to some defined memory, we can store
-some data and return the pointer. Using pointers and memory allocation in this way, we can pass strings and other data
+some data in it and return the pointer. Using pointers and memory allocation in this way, we can pass strings and other data
 structures around between functions.
 
 There are two caveats with this implementation. Firstly, we need to ensure that we free up any memory we allocate once
@@ -101,9 +101,9 @@ If we don't free the memory after using it, the script will keep allocating more
 a memory leak - a buildup of memory that's allocated but not used. Besides robbing the rest of the computer of RAM, your
 program can eventually run out of free memory and crash.
 
-Secondly, it's pretty hard to miss the hard-coded limits on the memory allocated and data read in.
-It's very easy to use `fgets` to read in a line of up to `x` characters, however what if we find a line line longer than
-`x`? Consider a file with the following content:
+Secondly, it's pretty hard to miss the hard-coded limits on the memory allocated and data read in. In the example above
+we read up to a new line or 1024 characters, but what should we do if we find a line longer than that? Consider a file
+with the following content:
 
     a line\n
     a much longer line that is longer than 1024 characters [...]\n
@@ -114,7 +114,7 @@ the string 'a line\n', which we may then write to an output file. Calling it aga
 longer than 1024 characters, not only will the returned string be truncated, it will also be missing the '\n'
 terminator! Of course, if we try to write this to an output file and then run the function a third time for 'another
 line', the string 'another line' will be appended to the second line of the output file, because there was no '\n' on
-the end of the second line. In the context used here, we would end up with corrupted fastq files!
+the end of the second line. In the context used here, we would end up with corrupted fastq files.
 
 ## Accommodating long lines
 Of course we could just set the block size to something bigger than 1024, but if we want to be able to tolerate lines of

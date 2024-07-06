@@ -92,7 +92,7 @@ bioinformatics), and then read that uncompressed data in line by line. This is p
 library, and is discussed in the companion article on C.
 
 
-## Compressing output data
+## Compressing output data
 Because data files are usually GZ compressed, our script needs to be able to output `fastq.gz` files. Once again, `zlib`
 is capable of this, however when we ran it, it turned out to be about the same speed as Sickle, despite not doing any of
 Sickle's sliding windows or quality filtering! Clearly, our original sliding-window-slowdown hypothesis was wrong, and

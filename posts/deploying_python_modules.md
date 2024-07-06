@@ -79,7 +79,7 @@ from distutils.core import setup
 setup(
     name='EGCG-Core',
     version='0.1',
-    packages=['egcg_core', 'egcg_core.executor', 'egcg_core.executor.script_writer']
+    packages=['egcg_core', 'egcg_core.executor', 'egcg_core.executor.script_writer'],
     url='< project website >',
     license='MIT',
     description='Shared functionality across EGCG projects',

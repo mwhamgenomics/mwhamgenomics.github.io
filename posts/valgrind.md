@@ -16,7 +16,7 @@ think we were mishandling memory somewhere - very possible, since I'm still fair
 what was going wrong, I used a piece of software called Valgrind.
 
 While advanced usage and interpretation of its optional outputs can get complicated, basic usage of Valgrind is very
-simple. You simply attach it to your program by prepending it to the command line you would normally use:
+simple. You attach it to your program by prepending it to the command line you would normally use:
 
     [mwhamgenomics]$ valgrind <valgrind_args> ./program <program_args>
 

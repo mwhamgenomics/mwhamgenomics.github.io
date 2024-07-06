@@ -11,7 +11,7 @@ external_links:
 publish: false
 ---
 
-I've pent a bit of time playing around with machine learning and video games, which involved setting up an
+I've spent a bit of time playing around with machine learning and video games, which involved setting up an
 emulator for playing Super Nintendo games, which I would then try get neural networks to 'play'. At
 this point, I hit not really a technical hitch, but a pause for thought: did I really want to develop a
 neural network that's better at games than me? Clearly to allow this work to proceed, I had to brush up

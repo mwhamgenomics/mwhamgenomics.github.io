@@ -15,23 +15,22 @@ external_links:
 
 In the course of developing
 [a C tool for filtering paired-end fastq files](https://github.com/EdinburghGenomics/Fastq-Filterer), we ran into a
-performance problem. C is capable of performing logic and processing data extremely quickly, however, we encountered a
+performance problem. C is extremely fast, however we encountered a
 bottleneck at the point of re-compressing output data. This was because we were compressing in a single thread using C's
 `zlib` library. We eventually decided to remove integrated output data compression, and compress instead via an external
 tool.
 
-The script we developed is fairly simple to use: the two input fastqs (R1 and R2) are passed as `i1` and `i2`, the
+The script we developed takes two input fastqs (R1 and R2) passed as `i1` and `i2`, the
 corresponding (filtered and uncompressed) output fastqs are specified as `o1` and `o2`, and a length threshold at which
 to trim out a read pair is passed as `threshold`:
 
     [mwhamgenomics]$ ./fastq_filterer --i1 r1.fastq.gz --i2 r2.fastq.gz --o1 filtered_r1.fastq --o2 filtered_r2.fastq --threshold 36
 
 Now to compress the output data. There is a Linux tool called [Pigz](https://github.com/madler/pigz) that solves our
-performance problem, since it allows compression of data in multiple threads. The only problem we have to solve, then,
-is how to link this in to our program (ideally we would do this via pipes without writing any intermediate files to
-disk).
+performance problem, since it allows compression of data in multiple threads. The only problem left is linking this up
+via pipes without writing any intermediate files to disk.
 
-If we were only dealing with one output fastq, we'd just be able to pipe it into pigz via `stdout`, however in this
+If we were only dealing with one output fastq, we'd just be able to pipe it into pigz via stdout, however in this
 case, there are two. We could use stdout and stderr, but what if something goes wrong and the filterer has to print an
 error message? Fortunately, Bash has solutions for piping multiple channels of data between programs.
 
